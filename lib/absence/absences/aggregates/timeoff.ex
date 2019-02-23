@@ -10,12 +10,14 @@ defmodule Absence.Absences.Aggregates.Timeoff do
     hours: 0
   ]
 
-  def apply(%AddHours{} = add_hours, %Timeoff{} = timeoff) do
-    event = %HoursAdded{
+  def execute(%Timeoff{} = timeoff, %AddHours{} = add_hours) do
+    %HoursAdded{
       timeoff_id: timeoff.id,
       hours: add_hours.hours
     }
+  end
 
-    {:ok, event, %{timeoff | hours: timeoff.hours + add_hours.hours}}
+  def apply(%Timeoff{} = timeoff, %HoursAdded{hours: hours}) do
+    %{timeoff | hours: timeoff.hours + hours}
   end
 end

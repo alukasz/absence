@@ -19,12 +19,11 @@ defmodule Absence.Aggregate do
         {:ok, %__MODULE__{id: aggregate_id}}
       end
 
-      def handle_call({:apply, command}, from, state) do
-        {:ok, events, state} = __MODULE__.apply(command, state)
+      def handle_call({:execute, command}, from, aggregate) do
+        event = __MODULE__.execute(aggregate, command)
+        aggregate = __MODULE__.apply(aggregate, event)
 
-        IO.inspect events, label: "events"
-
-        {:reply, :ok, state}
+        {:reply, event, aggregate}
       end
     end
   end
@@ -32,7 +31,7 @@ defmodule Absence.Aggregate do
   def execute({_mod, _id} = aggregate, command) do
     {:ok, aggregate_pid} = find_aggregate(aggregate)
 
-    GenServer.call(aggregate_pid, {:apply, command})
+    GenServer.call(aggregate_pid, {:execute, command})
   end
 
   def execute(%aggregate_mod{id: aggregate_id}, command) do

@@ -13,13 +13,16 @@ defmodule Absence.Absences.Aggregates.TimeoffTest do
   end
 
   describe "adding hours" do
-    test "adds hours", %{timeoff: timeoff} do
+    test "AddHours command generates HoursAdded event", %{timeoff: timeoff} do
       command = build(:command_add_hours, hours: 8)
 
-      expected_event = %HoursAdded{timeoff_id: timeoff.id, hours: command.hours}
-      expected_aggregate = %{timeoff | hours: timeoff.hours + command.hours}
+      assert Timeoff.execute(timeoff, command) == %HoursAdded{timeoff_id: timeoff.id, hours: command.hours}
+    end
 
-      assert {:ok, ^expected_event, ^expected_aggregate} = Timeoff.apply(command, timeoff)
+    test "HoursAdded events increases hours of aggregate", %{timeoff: timeoff} do
+      event = build(:event_hours_added, timeoff_id: timeoff.id)
+
+      assert Timeoff.apply(timeoff, event) == %{timeoff | hours: timeoff.hours + event.hours}
     end
   end
 end
