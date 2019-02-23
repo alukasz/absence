@@ -12,3 +12,5 @@ services:
       - ./setup.sh
   db:
     image: postgres:10
+    ports:
+      - "5432:5432"
