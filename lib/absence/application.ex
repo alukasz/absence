@@ -7,8 +7,8 @@ defmodule Absence.Application do
     children = [
       Absence.Repo,
       AbsenceWeb.Endpoint,
-      Absence.AggregateSupervisor,
-      {Registry, keys: :unique, name: Absence.AggregateRegistry}
+      EventSourcing.AggregateSupervisor,
+      {Registry, keys: :unique, name: EventSourcing.AggregateRegistry}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

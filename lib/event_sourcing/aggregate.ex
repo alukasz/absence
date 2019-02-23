@@ -1,9 +1,9 @@
-defmodule Absence.Aggregate do
+defmodule EventSourcing.Aggregate do
   defmacro __using__(_opts) do
     quote do
       use GenServer
 
-      import Absence.Aggregate, only: [name: 2]
+      import EventSourcing.Aggregate, only: [name: 2]
 
       def start_link(aggregate_id) do
         GenServer.start_link(__MODULE__, aggregate_id, name: name(__MODULE__, aggregate_id))
@@ -33,13 +33,13 @@ defmodule Absence.Aggregate do
   end
 
   def name(aggregate_mod, aggregate_id) do
-    {:via, Registry, {Absence.AggregateRegistry, {aggregate_mod, aggregate_id}}}
+    {:via, Registry, {EventSourcing.AggregateRegistry, {aggregate_mod, aggregate_id}}}
   end
 
   defp find_aggregate(aggregate) do
-    case Registry.lookup(Absence.AggregateRegistry, aggregate) do
+    case Registry.lookup(EventSourcing.AggregateRegistry, aggregate) do
       [{pid, _}] -> {:ok, pid}
-      [] -> Absence.AggregateSupervisor.start_aggregate(aggregate)
+      [] -> EventSourcing.AggregateSupervisor.start_aggregate(aggregate)
     end
   end
 end

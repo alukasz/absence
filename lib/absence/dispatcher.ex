@@ -1,19 +1,8 @@
 defmodule Absence.Dispatcher do
-  defmacro __using__(_opts) do
-    quote do
-      import Absence.Dispatcher
-    end
-  end
+  use EventSourcing.Dispatcher
 
-  defmacro dispatch(command_mod, opts) do
-    aggregate_mod = Keyword.fetch!(opts, :to)
-    identity = Keyword.fetch!(opts, :identity)
+  alias Absence.Absences.Aggregates.Timeoff
+  alias Absence.Absences.Commands.AddHours
 
-    quote do
-      def dispatch(%unquote(command_mod){unquote(identity) => id} = command) do
-        aggregate = {unquote(aggregate_mod), id}
-        Absence.Aggregate.execute(aggregate, command)
-      end
-    end
-  end
+  dispatch AddHours, to: Timeoff, identity: :timeoff_id
 end

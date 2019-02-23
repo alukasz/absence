@@ -1,4 +1,4 @@
-defmodule Absence.AggregateSupervisor do
+defmodule EventSourcing.AggregateSupervisor do
   use DynamicSupervisor
 
   def start_link(opts) do
