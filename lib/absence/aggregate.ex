@@ -1,12 +1,6 @@
 defmodule Absence.Aggregate do
   defmacro __using__(_opts) do
     quote do
-      @before_compile Absence.Aggregate
-    end
-  end
-
-  defmacro __before_compile__(_env) do
-    quote do
       use GenServer
 
       import Absence.Aggregate, only: [name: 2]
@@ -16,7 +10,7 @@ defmodule Absence.Aggregate do
       end
 
       def init(aggregate_id) do
-        {:ok, %__MODULE__{id: aggregate_id}}
+        {:ok, apply(__MODULE__, :__struct__, [[id: aggregate_id]])}
       end
 
       def handle_call({:execute, command}, from, aggregate) do
