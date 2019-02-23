@@ -1,0 +1,14 @@
+version: '2'
+services:
+  app:
+    build: .
+    ports:
+      - "4000:4000"
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+    command:
+      - ./setup.sh
+  db:
+    image: postgres:10

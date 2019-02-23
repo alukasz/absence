@@ -71,5 +71,5 @@ config :absence, Absence.Repo,
   username: "postgres",
   password: "postgres",
   database: "absence_dev",
-  hostname: "localhost",
+  hostname: "db",
   pool_size: 10

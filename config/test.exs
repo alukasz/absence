@@ -14,5 +14,5 @@ config :absence, Absence.Repo,
   username: "postgres",
   password: "postgres",
   database: "absence_test",
-  hostname: "localhost",
+  hostname: "db",
   pool: Ecto.Adapters.SQL.Sandbox
