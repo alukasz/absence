@@ -44,7 +44,6 @@ defmodule EventSourcing.AggregatesTest do
       Aggregates.execute_command(aggregate, %Increment{})
 
       assert is_pid(find_aggregate_pid(aggregate))
-      assert aggregate |> find_aggregate_pid() |> is_pid()
     end
 
     test "reuses aggregate process", %{aggregate: aggregate} do
