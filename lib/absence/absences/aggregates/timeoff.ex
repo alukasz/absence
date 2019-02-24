@@ -6,13 +6,13 @@ defmodule Absence.Absences.Aggregates.Timeoff do
   alias Absence.Absences.Events.HoursAdded
 
   defstruct [
-    :id,
+    :uuid,
     hours: 0
   ]
 
   def execute(%Timeoff{} = timeoff, %AddHours{} = add_hours) do
     %HoursAdded{
-      timeoff_id: timeoff.id,
+      timeoff_uuid: timeoff.uuid,
       hours: add_hours.hours
     }
   end

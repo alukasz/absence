@@ -7,7 +7,7 @@ defmodule Absence.Factory do
 
   def aggregate_timeoff_factory do
     %Timeoff{
-      id: :rand.uniform(10000),
+      uuid: :rand.uniform(10000),
       hours: 80
     }
   end

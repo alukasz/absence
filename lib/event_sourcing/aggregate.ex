@@ -5,12 +5,12 @@ defmodule EventSourcing.Aggregate do
 
       import EventSourcing.Aggregate, only: [name: 2]
 
-      def start_link(aggregate_id) do
-        GenServer.start_link(__MODULE__, aggregate_id, name: name(__MODULE__, aggregate_id))
+      def start_link(aggregate_uuid) do
+        GenServer.start_link(__MODULE__, aggregate_uuid, name: name(__MODULE__, aggregate_uuid))
       end
 
-      def init(aggregate_id) do
-        {:ok, apply(__MODULE__, :__struct__, [[id: aggregate_id]])}
+      def init(aggregate_uuid) do
+        {:ok, apply(__MODULE__, :__struct__, [[uuid: aggregate_uuid]])}
       end
 
       def handle_call({:execute, command}, from, aggregate) do
@@ -22,18 +22,18 @@ defmodule EventSourcing.Aggregate do
     end
   end
 
-  def execute({_mod, _id} = aggregate, command) do
+  def execute({_mod, _uuid} = aggregate, command) do
     {:ok, aggregate_pid} = find_aggregate(aggregate)
 
     GenServer.call(aggregate_pid, {:execute, command})
   end
 
-  def execute(%aggregate_mod{id: aggregate_id}, command) do
-    execute({aggregate_mod, aggregate_id}, command)
+  def execute(%aggregate_mod{id: aggregate_uuid}, command) do
+    execute({aggregate_mod, aggregate_uuid}, command)
   end
 
-  def name(aggregate_mod, aggregate_id) do
-    {:via, Registry, {EventSourcing.AggregateRegistry, {aggregate_mod, aggregate_id}}}
+  def name(aggregate_mod, aggregate_uuid) do
+    {:via, Registry, {EventSourcing.AggregateRegistry, {aggregate_mod, aggregate_uuid}}}
   end
 
   defp find_aggregate(aggregate) do
