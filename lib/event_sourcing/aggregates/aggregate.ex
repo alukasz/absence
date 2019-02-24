@@ -17,6 +17,7 @@ defmodule EventSourcing.Aggregates.Aggregate do
 
   def init({aggregate_mod, aggregate_uuid}) do
     aggregate = apply(aggregate_mod, :__struct__, [[uuid: aggregate_uuid]])
+
     state = %{
       aggregate_mod: aggregate_mod,
       aggregate_uuid: aggregate_uuid,
