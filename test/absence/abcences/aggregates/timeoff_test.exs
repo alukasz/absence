@@ -7,14 +7,14 @@ defmodule Absence.Absences.Aggregates.TimeoffTest do
   alias Absence.Absences.Events.HoursAdded
 
   setup do
-    timeoff = build(:aggregate_timeoff)
+    timeoff = build_aggregate(:timeoff)
 
     {:ok, timeoff: timeoff}
   end
 
   describe "adding hours" do
     test "AddHours command generates HoursAdded event", %{timeoff: timeoff} do
-      command = build(:command_add_hours, hours: 8)
+      command = build_command(:add_hours, hours: 8)
 
       assert Timeoff.execute(timeoff, command) == %HoursAdded{
                timeoff_uuid: timeoff.uuid,
@@ -23,7 +23,7 @@ defmodule Absence.Absences.Aggregates.TimeoffTest do
     end
 
     test "HoursAdded events increases hours of aggregate", %{timeoff: timeoff} do
-      event = build(:event_hours_added, timeoff_uuid: timeoff.uuid)
+      event = build_event(:hours_added, timeoff_uuid: timeoff.uuid)
 
       assert Timeoff.apply(timeoff, event) == %{timeoff | hours: timeoff.hours + event.hours}
     end

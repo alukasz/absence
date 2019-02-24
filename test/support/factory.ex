@@ -1,26 +1,7 @@
 defmodule Absence.Factory do
-  use ExMachina
+  defdelegate build_aggregate(factory_name, attrs \\ []), to: Absence.Factory.AggregateFactory, as: :build
 
-  alias Absence.Absences.Aggregates.Timeoff
-  alias Absence.Absences.Commands.AddHours
-  alias Absence.Absences.Events.HoursAdded
+  defdelegate build_command(factory_name, attrs \\ []), to: Absence.Factory.CommandFactory, as: :build
 
-  def aggregate_timeoff_factory do
-    %Timeoff{
-      uuid: :rand.uniform(10000),
-      hours: 80
-    }
-  end
-
-  def event_hours_added_factory do
-    %HoursAdded{
-      hours: 8
-    }
-  end
-
-  def command_add_hours_factory do
-    %AddHours{
-      hours: 8
-    }
-  end
+  defdelegate build_event(factory_name, attrs \\ []), to: Absence.Factory.EventFactory, as: :build
 end
