@@ -7,14 +7,15 @@ defmodule EventSourcing.AggregatesTest do
   @registry EventSourcing.AggregateRegistry
 
   defmodule Increment do
-    defstruct [:counter_uuid]
+    defstruct [:uuid, :counter_uuid]
   end
 
   defmodule Incremented do
-    defstruct [:counter_uuid]
+    defstruct [:uuid, :counter_uuid]
   end
 
   defmodule Counter do
+    @behaviour EventSourcing.Aggregate
     defstruct [:uuid, value: 0]
 
     def execute(%Counter{} = counter, %Increment{}) do

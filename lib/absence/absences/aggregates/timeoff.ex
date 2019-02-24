@@ -1,4 +1,6 @@
 defmodule Absence.Absences.Aggregates.Timeoff do
+  @behaviour EventSourcing.Aggregate
+
   alias __MODULE__
   alias Absence.Absences.Commands.AddHours
   alias Absence.Absences.Events.HoursAdded
