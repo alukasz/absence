@@ -10,9 +10,9 @@ defmodule EventSourcing.Dispatcher do
     identity = Keyword.fetch!(opts, :identity)
 
     quote do
-      def dispatch(%unquote(command_mod){unquote(identity) => id} = command) do
-        aggregate = {unquote(aggregate_mod), id}
-        EventSourcing.Aggregate.execute(aggregate, command)
+      def dispatch(%unquote(command_mod){unquote(identity) => uuid} = command) do
+        aggregate = {unquote(aggregate_mod), uuid}
+        EventSourcing.Aggregates.execute_command(aggregate, command)
       end
     end
   end

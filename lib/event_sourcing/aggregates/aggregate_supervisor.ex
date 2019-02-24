@@ -1,12 +1,14 @@
-defmodule EventSourcing.AggregateSupervisor do
+defmodule EventSourcing.Aggregates.AggregateSupervisor do
   use DynamicSupervisor
+
+  alias EventSourcing.Aggregates.Aggregate
 
   def start_link(opts) do
     DynamicSupervisor.start_link(__MODULE__, opts, name: __MODULE__)
   end
 
-  def start_aggregate({aggregate_mod, aggregate_id}) do
-    child_spec = aggregate_mod.child_spec(aggregate_id)
+  def start_aggregate({_mod, _uuid} = aggregate) do
+    child_spec = Aggregate.child_spec(aggregate)
 
     DynamicSupervisor.start_child(__MODULE__, child_spec)
   end

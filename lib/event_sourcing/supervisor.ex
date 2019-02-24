@@ -7,7 +7,7 @@ defmodule EventSourcing.Supervisor do
 
   def init(_) do
     children = [
-      EventSourcing.AggregateSupervisor,
+      EventSourcing.Aggregates.AggregateSupervisor,
       {Registry, keys: :unique, name: EventSourcing.AggregateRegistry}
     ]
 
