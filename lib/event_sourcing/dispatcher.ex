@@ -2,6 +2,16 @@ defmodule EventSourcing.Dispatcher do
   defmacro __using__(_opts) do
     quote do
       import EventSourcing.Dispatcher
+
+      @before_compile EventSourcing.Dispatcher
+    end
+  end
+
+  defmacro __before_compile__(_env) do
+    quote do
+      def dispatch(_) do
+        {:error, :unregistered_command}
+      end
     end
   end
 

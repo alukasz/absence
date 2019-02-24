@@ -7,6 +7,10 @@ defmodule EventSourcing.DispatcherTest do
     defstruct [:uuid, :counter_uuid, :test_pid]
   end
 
+  defmodule Decrement do
+    defstruct [:uuid, :counter_uuid, :test_pid]
+  end
+
   defmodule Incremented do
     defstruct [:uuid, :counter_uuid]
   end
@@ -48,6 +52,14 @@ defmodule EventSourcing.DispatcherTest do
       Dispatcher.dispatch(command)
 
       assert_receive {:aggregate_called, Counter}
+    end
+
+    test "returns error tuple if command is not registered" do
+      command = %Decrement{counter_uuid: UUID.generate(), test_pid: self()}
+
+      {:error, :unregistered_command} = Dispatcher.dispatch(command)
+
+      refute_receive {:aggregate_called, Counter}
     end
   end
 end
