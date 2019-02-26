@@ -2,6 +2,7 @@ defmodule EventSourcing.AggregatesTest do
   use ExUnit.Case
 
   alias EventSourcing.Aggregates
+  alias EventSourcing.EventStore.AgentEventStore
   alias Ecto.UUID
 
   @registry EventSourcing.AggregateRegistry
@@ -66,6 +67,12 @@ defmodule EventSourcing.AggregatesTest do
 
       refute aggregate1 == aggregate2
       refute pid1 == pid2
+    end
+
+    test "stores event in store under aggregate uuid", %{aggregate: {_mod, uuid} = aggregate} do
+      Aggregates.execute_command(aggregate, %Increment{})
+
+      assert [%Incremented{}] = AgentEventStore.get(uuid)
     end
   end
 

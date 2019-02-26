@@ -1,6 +1,8 @@
 defmodule EventSourcing.Aggregates.Aggregate do
   use GenServer
 
+  alias EventSourcing.EventStore.AgentEventStore
+
   @registry EventSourcing.AggregateRegistry
 
   def start_link({_mod, _uuid} = aggregate) do
@@ -31,7 +33,12 @@ defmodule EventSourcing.Aggregates.Aggregate do
     %{aggregate_mod: aggregate_mod, aggregate: aggregate} = state
     event = aggregate_mod.execute(aggregate, command)
     aggregate = aggregate_mod.apply(aggregate, event)
+    store_event(aggregate, event)
 
     {:reply, {event, aggregate}, %{state | aggregate: aggregate}}
+  end
+
+  defp store_event(%{uuid: uuid} = _aggregate, event) do
+    AgentEventStore.put(uuid, event)
   end
 end
