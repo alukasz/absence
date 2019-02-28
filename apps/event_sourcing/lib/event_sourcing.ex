@@ -1,0 +1,2 @@
+defmodule EventSourcing do
+end
