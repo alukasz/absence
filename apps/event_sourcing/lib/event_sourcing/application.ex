@@ -6,6 +6,7 @@ defmodule EventSourcing.Application do
   def start(_type, _args) do
     children = [
       EventSourcing.Aggregates.AggregateSupervisor,
+      EventSourcing.EventHandler,
       {Registry, keys: :unique, name: EventSourcing.AggregateRegistry}
     ]
 
