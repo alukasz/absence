@@ -20,7 +20,6 @@ defmodule AbsenceWeb do
   def controller do
     quote do
       use Phoenix.Controller, namespace: AbsenceWeb
-
       import Plug.Conn
       import AbsenceWeb.Gettext
       alias AbsenceWeb.Router.Helpers, as: Routes

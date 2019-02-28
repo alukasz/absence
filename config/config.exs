@@ -1,21 +1,16 @@
 # This file is responsible for configuring your application
 # and its dependencies with the aid of the Mix.Config module.
-#
-# This configuration file is loaded before any dependency and
-# is restricted to this project.
-
-# General application configuration
 use Mix.Config
 
-config :absence,
-  ecto_repos: [Absence.Repo]
-
-# Configures the endpoint
-config :absence, AbsenceWeb.Endpoint,
-  url: [host: "localhost"],
-  secret_key_base: "VPBX431o72TKeWLis3YESGxoDNCVJrsSH8K4xc33eYmPXA5IT8TBtUfIJsbwjxn1",
-  render_errors: [view: AbsenceWeb.ErrorView, accepts: ~w(html json)],
-  pubsub: [name: Absence.PubSub, adapter: Phoenix.PubSub.PG2]
+# By default, the umbrella project as well as each child
+# application will require this configuration file, as
+# configuration and dependencies are shared in an umbrella
+# project. While one could configure all applications here,
+# we prefer to keep the configuration of each individual
+# child application in their own app, but all other
+# dependencies, regardless if they belong to one or multiple
+# apps, should be configured in the umbrella to avoid confusion.
+import_config "../apps/*/config/config.exs"
 
 # Configures Elixir's Logger
 config :logger, :console,

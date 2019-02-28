@@ -20,5 +20,5 @@ defmodule AbsenceWeb.Gettext do
 
   See the [Gettext Docs](https://hexdocs.pm/gettext) for detailed usage.
   """
-  use Gettext, otp_app: :absence
+  use Gettext, otp_app: :absence_web
 end

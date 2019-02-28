@@ -1,5 +1,5 @@
 defmodule AbsenceWeb.Endpoint do
-  use Phoenix.Endpoint, otp_app: :absence
+  use Phoenix.Endpoint, otp_app: :absence_web
 
   socket "/socket", AbsenceWeb.UserSocket,
     websocket: true,
@@ -11,7 +11,7 @@ defmodule AbsenceWeb.Endpoint do
   # when deploying your static files in production.
   plug Plug.Static,
     at: "/",
-    from: :absence,
+    from: :absence_web,
     gzip: false,
     only: ~w(css fonts images js favicon.ico robots.txt)
 
@@ -39,8 +39,8 @@ defmodule AbsenceWeb.Endpoint do
   # Set :encryption_salt if you would also like to encrypt it.
   plug Plug.Session,
     store: :cookie,
-    key: "_absence_key",
-    signing_salt: "E6Cy795f"
+    key: "_absence_web_key",
+    signing_salt: "06yrtpxL"
 
   plug AbsenceWeb.Router
 end
