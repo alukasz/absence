@@ -32,10 +32,17 @@ defmodule EventSourcing.AggregatesTest do
 
     def put(uuid, %{test_pid: pid} = event) when is_pid(pid) do
       send(pid, {:store_put, uuid, event})
-      :ok
     end
 
     def get(_uuid), do: []
+  end
+
+  defmodule EventHandler do
+    use EventSourcing.EventHandler
+
+    handle %Incremented{test_pid: pid} = event, aggregate do
+      send(pid, {:event_handler, event, aggregate})
+    end
   end
 
   describe "execute_command/2" do
@@ -87,6 +94,12 @@ defmodule EventSourcing.AggregatesTest do
       {event, _} = Aggregates.execute_command(aggregate, command, store: EventStore)
 
       assert_receive {:store_put, ^uuid, ^event}
+    end
+
+    test "dispatches events to event handlers", %{aggregate: aggregate, command: command} do
+      {event, aggregate} = Aggregates.execute_command(aggregate, command)
+
+      assert_receive {:event_handler, ^event, ^aggregate}
     end
   end
 
