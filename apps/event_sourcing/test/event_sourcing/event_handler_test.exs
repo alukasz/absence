@@ -44,16 +44,16 @@ defmodule EventSourcing.EventHandlerTest do
   end
 
   describe "register_handler/2" do
-    test "adds module as event handler", %{event: %event{}} do
-      EventHandler.register_handler(event, TestHandler)
+    test "adds module as event handler", %{event: %event_mod{}, handler: handler} do
+      EventHandler.register_handler(event_mod, handler)
 
-      assert registered_handler?(event, TestHandler)
+      assert registered_handler?(event_mod, handler)
     end
   end
 
   describe "dispatch/2" do
-    setup %{event: %event{}} do
-      EventHandler.register_handler(event, TestHandler)
+    setup %{event: %event_mod{}, handler: handler} do
+      EventHandler.register_handler(event_mod, handler)
     end
 
     test "sends event to all handlers", %{event: event, aggregate: aggregate} do
