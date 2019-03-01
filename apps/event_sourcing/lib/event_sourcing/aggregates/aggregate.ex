@@ -1,6 +1,7 @@
 defmodule EventSourcing.Aggregates.Aggregate do
   use GenServer
 
+  alias EventSourcing.EventHandler
   alias EventSourcing.EventStore.AgentEventStore
 
   @registry EventSourcing.AggregateRegistry
@@ -35,6 +36,7 @@ defmodule EventSourcing.Aggregates.Aggregate do
     event = aggregate_mod.execute(aggregate, command)
     aggregate = aggregate_mod.apply(aggregate, event)
     store_event(store, aggregate, event)
+    EventHandler.dispatch(event, aggregate)
 
     {:reply, {event, aggregate}, %{state | aggregate: aggregate}}
   end

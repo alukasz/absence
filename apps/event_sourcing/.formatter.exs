@@ -1,6 +1,9 @@
 locals_without_parens = [
   # EventSourcing.Dispatcher
-  dispatch: 2
+  dispatch: 2,
+  # EventSourcing.EventHandler
+  handle: 2,
+  handle: 3
 ]
 
 [
