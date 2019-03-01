@@ -2,10 +2,7 @@ defmodule EventSourcing.EventStore.AgentEventStoreTest do
   use ExUnit.Case
 
   alias EventSourcing.EventStore.AgentEventStore
-
-  defmodule Incremented do
-    defstruct [:uuid, :counter_uuid]
-  end
+  alias EventSourcing.Counters.Events.Incremented
 
   setup do
     start_supervised(AgentEventStore)
