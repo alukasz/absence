@@ -1,3 +1,3 @@
-defmodule EventSourcing.Support.Counters.Commands.Increment do
+defmodule EventSourcing.Counters.Commands.Increment do
   defstruct [:uuid, :counter_uuid, :test_pid]
 end

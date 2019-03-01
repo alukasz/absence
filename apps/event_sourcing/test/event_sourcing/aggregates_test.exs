@@ -3,10 +3,10 @@ defmodule EventSourcing.AggregatesTest do
 
   alias EventSourcing.Aggregates
   alias Ecto.UUID
-  alias EventSourcing.Support.Counters.Aggregates.Counter
-  alias EventSourcing.Support.Counters.Commands.Increment
-  alias EventSourcing.Support.Counters.Events.Incremented
-  alias EventSourcing.Support.EventStore.InMemoryEventStore
+  alias EventSourcing.Counters.Aggregates.Counter
+  alias EventSourcing.Counters.Commands.Increment
+  alias EventSourcing.Counters.Events.Incremented
+  alias EventSourcing.EventStore.EventStoreMock
 
   @registry EventSourcing.AggregateRegistry
 
@@ -56,7 +56,7 @@ defmodule EventSourcing.AggregatesTest do
       aggregate: {_mod, uuid} = aggregate,
       command: command
     } do
-      {event, _} = Aggregates.execute_command(aggregate, command, store: InMemoryEventStore)
+      {event, _} = Aggregates.execute_command(aggregate, command, store: EventStoreMock)
 
       assert_receive {:store_put, ^uuid, ^event}
     end

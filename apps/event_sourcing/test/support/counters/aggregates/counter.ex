@@ -1,8 +1,8 @@
-defmodule EventSourcing.Support.Counters.Aggregates.Counter do
+defmodule EventSourcing.Counters.Aggregates.Counter do
   @behaviour EventSourcing.Aggregate
 
-  alias EventSourcing.Support.Counters.Commands.Increment
-  alias EventSourcing.Support.Counters.Events.Incremented
+  alias EventSourcing.Counters.Commands.Increment
+  alias EventSourcing.Counters.Events.Incremented
 
   defstruct [:uuid, value: 0]
 

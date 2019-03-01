@@ -2,7 +2,7 @@ defmodule EventSourcing.EventStore.AgentEventStoreTest do
   use ExUnit.Case
 
   alias EventSourcing.EventStore.AgentEventStore
-  alias EventSourcing.Support.Counters.Events.Incremented
+  alias EventSourcing.Counters.Events.Incremented
 
   setup do
     start_supervised(AgentEventStore)
