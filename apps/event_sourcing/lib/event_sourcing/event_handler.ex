@@ -1,8 +1,6 @@
 defmodule EventSourcing.EventHandler do
   use GenServer
 
-  alias __MODULE__
-
   defmacro __using__(_opts) do
     {:ok, _} = Application.ensure_all_started(:event_sourcing)
 
@@ -15,7 +13,7 @@ defmodule EventSourcing.EventHandler do
     event_mod = get_event_mod(event)
 
     quote do
-      EventHandler.register_handler(unquote(event_mod), __MODULE__)
+      EventSourcing.EventHandler.register_handler(unquote(event_mod), __MODULE__)
 
       def handle_event(unquote(event), unquote(aggregate)) do
         unquote(block)
