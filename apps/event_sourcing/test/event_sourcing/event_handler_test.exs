@@ -2,28 +2,17 @@ defmodule EventSourcing.EventHandlerTest do
   use ExUnit.Case
 
   alias EventSourcing.EventHandler
-
-  defmodule Incremented do
-    defstruct [:uuid, :counter_uuid, :test_pid]
-  end
-
-  defmodule Counter do
-    defstruct [:uuid, value: 0]
-  end
-
-  defmodule TestHandler do
-    def handle_event(%{test_pid: pid} = event, aggregate) do
-      send(pid, {:event_handler_called, event, aggregate})
-    end
-  end
+  alias EventSourcing.Counters.Aggregates.Counter
+  alias EventSourcing.Counters.Events.Incremented
+  alias EventSourcing.EventHandlerMock
 
   describe "handle/2,3 macro" do
     defmodule HandleTest do
       use EventSourcing.EventHandler
 
-      handle %Incremented{}, do: :ok
-
       handle %Incremented{}, %Counter{}, do: :ok
+
+      handle %Incremented{}, do: :ok
     end
 
     test "defines handle_event/2 function" do
@@ -38,7 +27,7 @@ defmodule EventSourcing.EventHandlerTest do
   setup do
     aggregate = %Counter{}
     event = %Incremented{test_pid: self()}
-    handler = TestHandler
+    handler = EventHandlerMock
 
     {:ok, aggregate: aggregate, event: event, handler: handler}
   end

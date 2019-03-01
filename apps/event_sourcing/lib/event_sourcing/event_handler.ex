@@ -14,7 +14,7 @@ defmodule EventSourcing.EventHandler do
   defmacro handle(event, aggregate \\ quote(do: _), do: block) do
     event_mod = get_event_mod(event)
 
-    quote location: :keep do
+    quote do
       EventHandler.register_handler(unquote(event_mod), __MODULE__)
 
       def handle_event(unquote(event), unquote(aggregate)) do

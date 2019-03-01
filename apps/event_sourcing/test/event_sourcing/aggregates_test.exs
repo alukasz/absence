@@ -2,11 +2,13 @@ defmodule EventSourcing.AggregatesTest do
   use ExUnit.Case
 
   alias EventSourcing.Aggregates
+  alias EventSourcing.EventHandler
   alias Ecto.UUID
   alias EventSourcing.Counters.Aggregates.Counter
   alias EventSourcing.Counters.Commands.Increment
   alias EventSourcing.Counters.Events.Incremented
   alias EventSourcing.EventStore.EventStoreMock
+  alias EventSourcing.EventHandlerMock
 
   @registry EventSourcing.AggregateRegistry
 
@@ -62,9 +64,11 @@ defmodule EventSourcing.AggregatesTest do
     end
 
     test "dispatches events to event handlers", %{aggregate: aggregate, command: command} do
+      EventHandler.register_handler(Incremented, EventHandlerMock)
+
       {event, aggregate} = Aggregates.execute_command(aggregate, command)
 
-      assert_receive {:event_handler, ^event, ^aggregate}
+      assert_receive {:event_handler_called, ^event, ^aggregate}
     end
   end
 
