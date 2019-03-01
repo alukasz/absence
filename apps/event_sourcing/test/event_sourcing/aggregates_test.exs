@@ -3,47 +3,12 @@ defmodule EventSourcing.AggregatesTest do
 
   alias EventSourcing.Aggregates
   alias Ecto.UUID
+  alias EventSourcing.Counters.Aggregates.Counter
+  alias EventSourcing.Counters.Commands.Increment
+  alias EventSourcing.Counters.Events.Incremented
+  alias EventSourcing.EventStore.EventStoreMock
 
   @registry EventSourcing.AggregateRegistry
-
-  defmodule Increment do
-    defstruct [:uuid, :counter_uuid, :test_pid]
-  end
-
-  defmodule Incremented do
-    defstruct [:uuid, :counter_uuid, :test_pid]
-  end
-
-  defmodule Counter do
-    @behaviour EventSourcing.Aggregate
-    defstruct [:uuid, value: 0]
-
-    def execute(%Counter{} = counter, %Increment{test_pid: pid}) do
-      %Incremented{counter_uuid: counter.uuid, test_pid: pid}
-    end
-
-    def apply(%Counter{value: value} = counter, %Incremented{}) do
-      %{counter | value: value + 1}
-    end
-  end
-
-  defmodule EventStore do
-    @behaviour EventSourcing.EventStore
-
-    def put(uuid, %{test_pid: pid} = event) when is_pid(pid) do
-      send(pid, {:store_put, uuid, event})
-    end
-
-    def get(_uuid), do: []
-  end
-
-  defmodule EventHandler do
-    use EventSourcing.EventHandler
-
-    handle %Incremented{test_pid: pid} = event, aggregate do
-      send(pid, {:event_handler, event, aggregate})
-    end
-  end
 
   describe "execute_command/2" do
     setup :aggregate
@@ -91,7 +56,7 @@ defmodule EventSourcing.AggregatesTest do
       aggregate: {_mod, uuid} = aggregate,
       command: command
     } do
-      {event, _} = Aggregates.execute_command(aggregate, command, store: EventStore)
+      {event, _} = Aggregates.execute_command(aggregate, command, store: EventStoreMock)
 
       assert_receive {:store_put, ^uuid, ^event}
     end
