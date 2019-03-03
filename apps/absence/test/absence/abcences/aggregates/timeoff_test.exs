@@ -35,9 +35,9 @@ defmodule Absence.Absences.Aggregates.TimeoffTest do
       command = build_command(:remove_hours, hours: 8)
 
       assert Timeoff.execute(timeoff, command) == %HoursRemoved{
-        timeoff_uuid: timeoff.uuid,
-        hours: command.hours
-      }
+               timeoff_uuid: timeoff.uuid,
+               hours: command.hours
+             }
     end
 
     test "HoursRemoved events decreases hours of aggregate", %{timeoff: timeoff} do
