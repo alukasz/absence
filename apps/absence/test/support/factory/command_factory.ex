@@ -8,4 +8,10 @@ defmodule Absence.Factory.CommandFactory do
       hours: 8
     }
   end
+
+  def remove_hours_factory do
+    %Commands.RemoveHours{
+      hours: 8
+    }
+  end
 end
