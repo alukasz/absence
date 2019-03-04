@@ -8,4 +8,10 @@ defmodule Absence.Factory.EventFactory do
       hours: 8
     }
   end
+
+  def hours_removed_factory do
+    %Events.HoursRemoved{
+      hours: 8
+    }
+  end
 end

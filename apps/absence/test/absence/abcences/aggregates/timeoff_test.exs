@@ -5,6 +5,7 @@ defmodule Absence.Absences.Aggregates.TimeoffTest do
 
   alias Absence.Absences.Aggregates.Timeoff
   alias Absence.Absences.Events.HoursAdded
+  alias Absence.Absences.Events.HoursRemoved
 
   setup do
     timeoff = build_aggregate(:timeoff)
@@ -26,6 +27,23 @@ defmodule Absence.Absences.Aggregates.TimeoffTest do
       event = build_event(:hours_added, timeoff_uuid: timeoff.uuid)
 
       assert Timeoff.apply(timeoff, event) == %{timeoff | hours: timeoff.hours + event.hours}
+    end
+  end
+
+  describe "removing hours" do
+    test "RemoveHours command generates HoursRemoved event", %{timeoff: timeoff} do
+      command = build_command(:remove_hours, hours: 8)
+
+      assert Timeoff.execute(timeoff, command) == %HoursRemoved{
+               timeoff_uuid: timeoff.uuid,
+               hours: command.hours
+             }
+    end
+
+    test "HoursRemoved events decreases hours of aggregate", %{timeoff: timeoff} do
+      event = build_event(:hours_removed, timeoff_uuid: timeoff.uuid)
+
+      assert Timeoff.apply(timeoff, event) == %{timeoff | hours: timeoff.hours - event.hours}
     end
   end
 end

@@ -3,7 +3,9 @@ defmodule Absence.Absences.Aggregates.Timeoff do
 
   alias __MODULE__
   alias Absence.Absences.Commands.AddHours
+  alias Absence.Absences.Commands.RemoveHours
   alias Absence.Absences.Events.HoursAdded
+  alias Absence.Absences.Events.HoursRemoved
 
   defstruct [
     :uuid,
@@ -17,7 +19,18 @@ defmodule Absence.Absences.Aggregates.Timeoff do
     }
   end
 
+  def execute(%Timeoff{} = timeoff, %RemoveHours{} = remove_hours) do
+    %HoursRemoved{
+      timeoff_uuid: timeoff.uuid,
+      hours: remove_hours.hours
+    }
+  end
+
   def apply(%Timeoff{} = timeoff, %HoursAdded{hours: hours}) do
     %{timeoff | hours: timeoff.hours + hours}
+  end
+
+  def apply(%Timeoff{} = timeoff, %HoursRemoved{hours: hours}) do
+    %{timeoff | hours: timeoff.hours - hours}
   end
 end
