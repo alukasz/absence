@@ -37,7 +37,7 @@ defmodule EventSourcing.Dispatcher do
           command_uuid: command.uuid || UUID.generate(),
           command: command,
           aggregate_mod: unquote(aggregate_mod),
-          aggregate_uuid: aggregate_uuid,
+          aggregate_uuid: aggregate_uuid
         }
 
         Aggregates.execute_command({unquote(aggregate_mod), aggregate_uuid}, command, context)

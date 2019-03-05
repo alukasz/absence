@@ -67,7 +67,11 @@ defmodule EventSourcing.AggregatesTest do
       assert_receive {:store_put, ^uuid, ^event}
     end
 
-    test "dispatches events to event handlers", %{aggregate: aggregate, command: command, context: context} do
+    test "dispatches events to event handlers", %{
+      aggregate: aggregate,
+      command: command,
+      context: context
+    } do
       EventHandler.register_handler(Incremented, EventHandlerMock)
 
       {event, aggregate} = Aggregates.execute_command(aggregate, command, context)
@@ -78,7 +82,9 @@ defmodule EventSourcing.AggregatesTest do
 
   defp aggregate(_) do
     aggregate = {Counter, UUID.generate()}
-    {:ok, _} = start_supervised({Aggregates.Aggregate, {aggregate, [store: EventStoreMock]}}, id: aggregate)
+
+    {:ok, _} =
+      start_supervised({Aggregates.Aggregate, {aggregate, [store: EventStoreMock]}}, id: aggregate)
 
     {:ok, aggregate: aggregate}
   end
