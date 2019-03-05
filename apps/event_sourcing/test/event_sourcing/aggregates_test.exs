@@ -74,17 +74,19 @@ defmodule EventSourcing.AggregatesTest do
     } do
       EventHandler.register_handler(Incremented, EventHandlerMock)
 
-      {event, aggregate} = Aggregates.execute_command(aggregate, command, context)
+      {event, _aggregate} = Aggregates.execute_command(aggregate, command, context)
 
-      assert_receive {:event_handler_called, ^event, ^aggregate}
+      assert_receive {:event_handler_called, ^event, %Counter{}}
     end
   end
 
   defp aggregate(_) do
-    aggregate = {Counter, UUID.generate()}
+    mod = Counter
+    uuid = UUID.generate()
+    aggregate = {mod, uuid}
+    opts = [aggregate_mod: mod, aggregate_uuid: uuid, event_store: EventStoreMock]
 
-    {:ok, _} =
-      start_supervised({Aggregates.Aggregate, {aggregate, [store: EventStoreMock]}}, id: aggregate)
+    {:ok, _} = start_supervised({Aggregates.Aggregate, opts}, id: aggregate)
 
     {:ok, aggregate: aggregate}
   end

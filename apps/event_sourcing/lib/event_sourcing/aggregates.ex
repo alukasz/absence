@@ -1,13 +1,11 @@
 defmodule EventSourcing.Aggregates do
-  alias EventSourcing.Aggregates.Aggregate
   alias EventSourcing.Aggregates.AggregateSupervisor
-  alias EventSourcing.Context
 
   @registry EventSourcing.AggregateRegistry
 
-  def execute_command({_mod, _uuid} = aggregate, command, %Context{} = _context) do
+  def execute_command({_mod, _uuid} = aggregate, command, context) do
     {:ok, pid} = get_aggregate(aggregate)
-    Aggregate.execute_command(pid, command)
+    GenServer.call(pid, {:execute, command, context})
   end
 
   defp get_aggregate({_mod, _uuid} = aggregate) do
