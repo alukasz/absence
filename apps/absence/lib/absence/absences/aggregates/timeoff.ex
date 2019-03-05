@@ -1,4 +1,4 @@
-defmodule Absence.Absences.Aggregates.Timeoff do
+defmodule Absence.Absences.Aggregates.Employee do
   @behaviour EventSourcing.Aggregate
 
   alias __MODULE__
@@ -12,25 +12,25 @@ defmodule Absence.Absences.Aggregates.Timeoff do
     hours: 0
   ]
 
-  def execute(%Timeoff{} = timeoff, %AddHours{} = add_hours) do
+  def execute(%Employee{} = timeoff, %AddHours{} = add_hours) do
     %HoursAdded{
       timeoff_uuid: timeoff.uuid,
       hours: add_hours.hours
     }
   end
 
-  def execute(%Timeoff{} = timeoff, %RemoveHours{} = remove_hours) do
+  def execute(%Employee{} = timeoff, %RemoveHours{} = remove_hours) do
     %HoursRemoved{
       timeoff_uuid: timeoff.uuid,
       hours: remove_hours.hours
     }
   end
 
-  def apply(%Timeoff{} = timeoff, %HoursAdded{hours: hours}) do
+  def apply(%Employee{} = timeoff, %HoursAdded{hours: hours}) do
     %{timeoff | hours: timeoff.hours + hours}
   end
 
-  def apply(%Timeoff{} = timeoff, %HoursRemoved{hours: hours}) do
+  def apply(%Employee{} = timeoff, %HoursRemoved{hours: hours}) do
     %{timeoff | hours: timeoff.hours - hours}
   end
 end

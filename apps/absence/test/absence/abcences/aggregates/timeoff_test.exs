@@ -1,9 +1,9 @@
-defmodule Absence.Absences.Aggregates.TimeoffTest do
+defmodule Absence.Absences.Aggregates.EmployeeTest do
   use ExUnit.Case, async: true
 
   import Absence.Factory
 
-  alias Absence.Absences.Aggregates.Timeoff
+  alias Absence.Absences.Aggregates.Employee
   alias Absence.Absences.Events.HoursAdded
   alias Absence.Absences.Events.HoursRemoved
 
@@ -17,7 +17,7 @@ defmodule Absence.Absences.Aggregates.TimeoffTest do
     test "AddHours command generates HoursAdded event", %{timeoff: timeoff} do
       command = build_command(:add_hours, hours: 8)
 
-      assert Timeoff.execute(timeoff, command) == %HoursAdded{
+      assert Employee.execute(timeoff, command) == %HoursAdded{
                timeoff_uuid: timeoff.uuid,
                hours: command.hours
              }
@@ -26,7 +26,7 @@ defmodule Absence.Absences.Aggregates.TimeoffTest do
     test "HoursAdded events increases hours of aggregate", %{timeoff: timeoff} do
       event = build_event(:hours_added, timeoff_uuid: timeoff.uuid)
 
-      assert Timeoff.apply(timeoff, event) == %{timeoff | hours: timeoff.hours + event.hours}
+      assert Employee.apply(timeoff, event) == %{timeoff | hours: timeoff.hours + event.hours}
     end
   end
 
@@ -34,7 +34,7 @@ defmodule Absence.Absences.Aggregates.TimeoffTest do
     test "RemoveHours command generates HoursRemoved event", %{timeoff: timeoff} do
       command = build_command(:remove_hours, hours: 8)
 
-      assert Timeoff.execute(timeoff, command) == %HoursRemoved{
+      assert Employee.execute(timeoff, command) == %HoursRemoved{
                timeoff_uuid: timeoff.uuid,
                hours: command.hours
              }
@@ -43,7 +43,7 @@ defmodule Absence.Absences.Aggregates.TimeoffTest do
     test "HoursRemoved events decreases hours of aggregate", %{timeoff: timeoff} do
       event = build_event(:hours_removed, timeoff_uuid: timeoff.uuid)
 
-      assert Timeoff.apply(timeoff, event) == %{timeoff | hours: timeoff.hours - event.hours}
+      assert Employee.apply(timeoff, event) == %{timeoff | hours: timeoff.hours - event.hours}
     end
   end
 end

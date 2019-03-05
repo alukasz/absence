@@ -4,7 +4,7 @@ defmodule Absence.Factory.AggregateFactory do
   alias Absence.Absences.Aggregates
 
   def timeoff_factory do
-    %Aggregates.Timeoff{
+    %Aggregates.Employee{
       uuid: :rand.uniform(10000),
       hours: 80
     }
