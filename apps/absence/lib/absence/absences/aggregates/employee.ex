@@ -10,6 +10,7 @@ defmodule Absence.Absences.Aggregates.Employee do
   defstruct [
     :uuid,
     hours: 0
+    timeoff_requests: []
   ]
 
   def execute(%Employee{} = timeoff, %AddHours{} = add_hours) do
