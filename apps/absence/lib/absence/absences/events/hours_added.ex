@@ -1,6 +1,6 @@
 defmodule Absence.Absences.Events.HoursAdded do
   defstruct [
-    :timeoff_uuid,
+    :employee_uuid,
     :hours
   ]
 end

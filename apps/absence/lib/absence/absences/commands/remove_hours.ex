@@ -1,7 +1,7 @@
 defmodule Absence.Absences.Commands.RemoveHours do
   defstruct [
     :uuid,
-    :timeoff_uuid,
+    :employee_uuid,
     :hours
   ]
 end
