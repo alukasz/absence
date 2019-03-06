@@ -1,7 +1,7 @@
-defmodule EventSourcing.Aggregates.AggregateSupervisor do
+defmodule EventSourcing.Aggregate.AggregateSupervisor do
   use DynamicSupervisor
 
-  alias EventSourcing.Aggregates.Aggregate
+  alias EventSourcing.Aggregate.AggregateServer
 
   def start_link(opts) do
     DynamicSupervisor.start_link(__MODULE__, opts, name: __MODULE__)
@@ -9,7 +9,7 @@ defmodule EventSourcing.Aggregates.AggregateSupervisor do
 
   def start_aggregate({aggregate_mod, aggregate_uuid}, opts \\ []) do
     aggregate = [aggregate_mod: aggregate_mod, aggregate_uuid: aggregate_uuid]
-    child_spec = Aggregate.child_spec(Keyword.merge(aggregate, opts))
+    child_spec = AggregateServer.child_spec(Keyword.merge(aggregate, opts))
 
     DynamicSupervisor.start_child(__MODULE__, child_spec)
   end

@@ -1,6 +1,6 @@
 defmodule EventSourcing.Dispatcher do
   alias EventSourcing.Context
-  alias EventSourcing.Aggregates
+  alias EventSourcing.Aggregate
   alias Ecto.UUID
 
   defmacro __using__(_opts) do
@@ -40,7 +40,7 @@ defmodule EventSourcing.Dispatcher do
           aggregate_uuid: aggregate_uuid
         }
 
-        Aggregates.execute_command({unquote(aggregate_mod), aggregate_uuid}, command, context)
+        Aggregate.execute_command({unquote(aggregate_mod), aggregate_uuid}, command, context)
       end
     end
   end

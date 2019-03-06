@@ -3,6 +3,6 @@ defmodule EventSourcing.Context do
     :command,
     :command_uuid,
     :aggregate_uuid,
-    :aggregate_mod,
+    :aggregate_mod
   ]
 end

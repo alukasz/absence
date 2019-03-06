@@ -1,4 +1,4 @@
-defmodule EventSourcing.Aggregates.Aggregate do
+defmodule EventSourcing.Aggregate.AggregateServer do
   use GenServer
 
   alias EventSourcing.EventHandler
@@ -19,6 +19,7 @@ defmodule EventSourcing.Aggregates.Aggregate do
   def name(opts) when is_list(opts) do
     [aggregate_mod: mod, aggregate_uuid: uuid] =
       Keyword.take(opts, [:aggregate_mod, :aggregate_uuid])
+
     name(mod, uuid)
   end
 
@@ -61,8 +62,8 @@ defmodule EventSourcing.Aggregates.Aggregate do
     state =
       state
       |> store_event(event)
-      |> dispatch_event(event)
       |> apply_events([event])
+      |> dispatch_event(event)
 
     {build_result(state, event), state}
   end
@@ -86,9 +87,11 @@ defmodule EventSourcing.Aggregates.Aggregate do
 
   defp apply_events(state, events) when is_list(events) do
     %{aggregate_mod: aggregate_mod, aggregate_state: aggregate_state} = state
-    aggregate_state = Enum.reduce(events, aggregate_state, fn event, state ->
-      aggregate_mod.apply(state, event)
-    end)
+
+    aggregate_state =
+      Enum.reduce(events, aggregate_state, fn event, state ->
+        aggregate_mod.apply(state, event)
+      end)
 
     %{state | aggregate_state: aggregate_state}
   end
