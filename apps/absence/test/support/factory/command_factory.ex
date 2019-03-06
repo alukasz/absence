@@ -16,7 +16,7 @@ defmodule Absence.Factory.CommandFactory do
   end
 
   def request_timeoff_factory do
-    %Commands.RequestTimeOff{
+    %Commands.RequestTimeoff{
       start_date: ~D[2019-01-01],
       end_date: ~D[2019-01-10]
     }

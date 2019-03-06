@@ -1,4 +1,4 @@
-defmodule Absence.Absences.Commands.RequestTimeOff do
+defmodule Absence.Absences.Commands.RequestTimeoff do
   defstruct [
     :uuid,
     :employee_uuid,

@@ -4,11 +4,11 @@ defmodule Absence.Absences.Aggregates.Employee do
   alias __MODULE__
   alias Absence.Absences.Commands.AddHours
   alias Absence.Absences.Commands.RemoveHours
-  alias Absence.Absences.Commands.RequestTimeOff
+  alias Absence.Absences.Commands.RequestTimeoff
   alias Absence.Absences.Events.HoursAdded
   alias Absence.Absences.Events.HoursRemoved
-  alias Absence.Absences.Events.TimeOffRequested
-  alias Absence.Absences.TimeOffRequest
+  alias Absence.Absences.Events.TimeoffRequested
+  alias Absence.Absences.TimeoffRequest
 
   defstruct [
     :uuid,
@@ -30,8 +30,8 @@ defmodule Absence.Absences.Aggregates.Employee do
     }
   end
 
-  def execute(%Employee{} = employee, %RequestTimeOff{} = request_timeoff) do
-    %TimeOffRequested{
+  def execute(%Employee{} = employee, %RequestTimeoff{} = request_timeoff) do
+    %TimeoffRequested{
       employee_uuid: employee.uuid,
       start_date: request_timeoff.start_date,
       end_date: request_timeoff.end_date
@@ -46,15 +46,11 @@ defmodule Absence.Absences.Aggregates.Employee do
     %{employee | hours: employee.hours - hours}
   end
 
-  def apply(%Employee{} = employee, %TimeOffRequested{start_date: start_date, end_date: end_date}) do
+  def apply(%Employee{} = employee, %TimeoffRequested{} = event) do
     %{
       employee
       | pending_timeoff_requests: [
-          %TimeOffRequest{
-            employee_uuid: employee.uuid,
-            start_date: start_date,
-            end_date: end_date
-          }
+          TimeoffRequest.from_event(event)
           | employee.pending_timeoff_requests
         ]
     }

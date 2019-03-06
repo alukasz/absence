@@ -6,8 +6,8 @@ defmodule Absence.Absences.Aggregates.EmployeeTest do
   alias Absence.Absences.Aggregates.Employee
   alias Absence.Absences.Events.HoursAdded
   alias Absence.Absences.Events.HoursRemoved
-  alias Absence.Absences.Events.TimeOffRequested
-  alias Absence.Absences.TimeOffRequest
+  alias Absence.Absences.Events.TimeoffRequested
+  alias Absence.Absences.TimeoffRequest
 
   setup do
     employee = build_aggregate(:employee)
@@ -50,56 +50,66 @@ defmodule Absence.Absences.Aggregates.EmployeeTest do
   end
 
   describe "requesting timeoff" do
-    test "RequestTimeOff command generates TimeOffRequestedEvent", %{employee: employee} do
+    test "RequestTimeoff command generates TimeoffRequestedEvent", %{employee: employee} do
       command = build_command(:request_timeoff)
 
-      assert Employee.execute(employee, command) == %TimeOffRequested{
+      assert Employee.execute(employee, command) == %TimeoffRequested{
                employee_uuid: employee.uuid,
                start_date: command.start_date,
                end_date: command.end_date
              }
     end
 
-    test "TimeOffRequested event adds TimeOffRequest to pending timeoff requests", %{
+    test "TimeoffRequested event adds TimeoffRequest to pending timeoff requests", %{
       employee: employee
     } do
       event = build_event(:timeoff_requested, employee_uuid: employee.uuid)
 
-      assert Employee.apply(employee, event) == %{
-               employee
-               | pending_timeoff_requests: [
-                   %TimeOffRequest{
-                     employee_uuid: employee.uuid,
-                     start_date: event.start_date,
-                     end_date: event.end_date
-                   }
-                 ]
-             }
+      expected_requests = [
+        %TimeoffRequest{
+          employee_uuid: employee.uuid,
+          start_date: event.start_date,
+          end_date: event.end_date
+        }
+      ]
+
+      assert %{pending_timeoff_requests: actual_requests} = Employee.apply(employee, event)
+
+      Enum.zip(expected_requests, actual_requests)
+      |> Enum.each(fn {expected, actual} -> same_map?(expected, actual) end)
     end
 
-    test "2 TimeOffRequested events add 2 TimeOffRequest to pending timeoff requests", %{
+    test "2 TimeoffRequested events add 2 TimeoffRequest to pending timeoff requests", %{
       employee: employee
     } do
       event1 = build_event(:timeoff_requested, employee_uuid: employee.uuid)
       event2 = build_event(:timeoff_requested, employee_uuid: employee.uuid)
 
+      expected_requests = [
+        %TimeoffRequest{
+          employee_uuid: employee.uuid,
+          start_date: event2.start_date,
+          end_date: event2.end_date
+        },
+        %TimeoffRequest{
+          employee_uuid: employee.uuid,
+          start_date: event1.start_date,
+          end_date: event1.end_date
+        }
+      ]
+
       employee = Employee.apply(employee, event1)
 
-      assert Employee.apply(employee, event2) == %{
-               employee
-               | pending_timeoff_requests: [
-                   %TimeOffRequest{
-                     employee_uuid: employee.uuid,
-                     start_date: event2.start_date,
-                     end_date: event2.end_date
-                   },
-                   %TimeOffRequest{
-                     employee_uuid: employee.uuid,
-                     start_date: event1.start_date,
-                     end_date: event1.end_date
-                   }
-                 ]
-             }
+      assert %{pending_timeoff_requests: actual_requests} = Employee.apply(employee, event2)
+
+      Enum.zip(expected_requests, actual_requests)
+      |> Enum.each(fn {expected, actual} -> same_map?(expected, actual) end)
     end
+  end
+
+  defp same_map?(expected, actual) do
+    assert expected.employee_uuid == actual.employee_uuid
+    assert expected.start_date == actual.start_date
+    assert expected.end_date == actual.end_date
   end
 end
