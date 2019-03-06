@@ -2,7 +2,7 @@
 
 mix deps.get
 
-cd assets
+cd apps/absence_web/assets/
 yarn install
 cd ..
 
