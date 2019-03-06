@@ -66,10 +66,10 @@ defmodule Absence.Absences.Aggregates.EmployeeTest do
       event = build_event(:timeoff_requested, employee_uuid: employee.uuid)
 
       expected_request = %TimeoffRequest{
-          employee_uuid: employee.uuid,
-          start_date: event.start_date,
-          end_date: event.end_date
-        }
+        employee_uuid: employee.uuid,
+        start_date: event.start_date,
+        end_date: event.end_date
+      }
 
       assert %{pending_timeoff_requests: [actual_request]} = Employee.apply(employee, event)
 
