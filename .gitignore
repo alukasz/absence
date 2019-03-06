@@ -21,5 +21,3 @@ erl_crash.dump
 
 # Other ingored paths
 .vscode
-node_modules
-yarn.lock
