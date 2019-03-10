@@ -2,6 +2,7 @@ defmodule EventSourcing.Aggregate.AggregateServer do
   use GenServer
 
   alias EventSourcing.EventHandler
+  alias Ecto.UUID
 
   defstruct [
     :aggregate_uuid,
@@ -57,7 +58,11 @@ defmodule EventSourcing.Aggregate.AggregateServer do
   defp execute_command(state, command, _context) do
     %{aggregate_mod: aggregate_mod, aggregate_state: aggregate_state} = state
 
-    event = aggregate_mod.execute(aggregate_state, command)
+    event =
+      case aggregate_mod.execute(aggregate_state, command) do
+        %{uuid: nil} = event -> %{event | uuid: UUID.generate()}
+        event -> event
+      end
 
     state =
       state
