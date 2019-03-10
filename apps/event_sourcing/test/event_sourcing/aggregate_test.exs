@@ -19,6 +19,21 @@ defmodule EventSourcing.AggregateTest do
     setup :command
     setup :context
 
+    test "invokes aggregate with command", %{aggregate: aggregate, command: command, context: context} do
+      Aggregate.execute_command(aggregate, command, context)
+
+      assert_receive {:aggregate_called, Counter, _}
+    end
+
+    test "adds UUID to command if not exist", %{aggregate: aggregate, command: command, context: context} do
+      command = %{command | uuid: nil}
+
+      Aggregate.execute_command(aggregate, command, context)
+
+      assert_receive {:aggregate_called, Counter, command}
+      refute command.uuid == nil
+    end
+
     test "returns event", %{aggregate: aggregate, command: command, context: context} do
       assert {%Incremented{}, _} = Aggregate.execute_command(aggregate, command, context)
     end
@@ -93,7 +108,7 @@ defmodule EventSourcing.AggregateTest do
   end
 
   defp command(_) do
-    command = %Increment{test_pid: self()}
+    command = %Increment{uuid: Ecto.UUID.generate(), test_pid: self()}
 
     {:ok, command: command}
   end

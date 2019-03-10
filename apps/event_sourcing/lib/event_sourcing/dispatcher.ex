@@ -1,7 +1,6 @@
 defmodule EventSourcing.Dispatcher do
   alias EventSourcing.Context
   alias EventSourcing.Aggregate
-  alias Ecto.UUID
 
   defmacro __using__(_opts) do
     quote do
@@ -34,7 +33,6 @@ defmodule EventSourcing.Dispatcher do
     quote do
       def dispatch(%unquote(command_mod){unquote(identity) => aggregate_uuid} = command) do
         context = %Context{
-          command_uuid: command.uuid || UUID.generate(),
           command: command,
           aggregate_mod: unquote(aggregate_mod),
           aggregate_uuid: aggregate_uuid
