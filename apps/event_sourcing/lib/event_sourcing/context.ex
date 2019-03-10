@@ -1,9 +1,8 @@
 defmodule EventSourcing.Context do
   defstruct [
-    :command_uuid,
     :command,
+    :command_uuid,
     :aggregate_uuid,
-    :aggregate_mod,
-    :identity
+    :aggregate_mod
   ]
 end

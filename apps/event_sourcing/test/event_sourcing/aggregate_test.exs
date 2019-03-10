@@ -1,7 +1,8 @@
-defmodule EventSourcing.AggregatesTest do
+defmodule EventSourcing.AggregateTest do
   use ExUnit.Case
 
-  alias EventSourcing.Aggregates
+  alias EventSourcing.Aggregate
+  alias EventSourcing.Aggregate.AggregateServer
   alias EventSourcing.Context
   alias EventSourcing.EventHandler
   alias Ecto.UUID
@@ -19,26 +20,26 @@ defmodule EventSourcing.AggregatesTest do
     setup :context
 
     test "returns event", %{aggregate: aggregate, command: command, context: context} do
-      assert {%Incremented{}, _} = Aggregates.execute_command(aggregate, command, context)
+      assert {%Incremented{}, _} = Aggregate.execute_command(aggregate, command, context)
     end
 
     test "returns updated aggregate", %{aggregate: aggregate, command: command, context: context} do
-      assert {_, %Counter{value: 1}} = Aggregates.execute_command(aggregate, command, context)
+      assert {_, %Counter{value: 1}} = Aggregate.execute_command(aggregate, command, context)
     end
 
     test "starts process for aggregate", %{command: command, context: context} do
       aggregate = {Counter, UUID.generate()}
       refute is_pid(find_aggregate_pid(aggregate))
 
-      Aggregates.execute_command(aggregate, command, context)
+      Aggregate.execute_command(aggregate, command, context)
 
       assert is_pid(find_aggregate_pid(aggregate))
     end
 
     test "reuses aggregate process", %{aggregate: aggregate, command: command, context: context} do
-      Aggregates.execute_command(aggregate, command, context)
+      Aggregate.execute_command(aggregate, command, context)
       pid1 = find_aggregate_pid(aggregate)
-      Aggregates.execute_command(aggregate, command, context)
+      Aggregate.execute_command(aggregate, command, context)
       pid2 = find_aggregate_pid(aggregate)
 
       assert pid1 == pid2
@@ -48,9 +49,9 @@ defmodule EventSourcing.AggregatesTest do
       {:ok, aggregate: aggregate1} = aggregate(test_context)
       {:ok, aggregate: aggregate2} = aggregate(test_context)
 
-      Aggregates.execute_command(aggregate1, command, context)
+      Aggregate.execute_command(aggregate1, command, context)
       pid1 = find_aggregate_pid(aggregate1)
-      Aggregates.execute_command(aggregate2, command, context)
+      Aggregate.execute_command(aggregate2, command, context)
       pid2 = find_aggregate_pid(aggregate2)
 
       refute aggregate1 == aggregate2
@@ -62,7 +63,7 @@ defmodule EventSourcing.AggregatesTest do
       command: command,
       context: context
     } do
-      {event, _} = Aggregates.execute_command(aggregate, command, context)
+      {event, _} = Aggregate.execute_command(aggregate, command, context)
 
       assert_receive {:store_put, ^uuid, ^event}
     end
@@ -74,17 +75,19 @@ defmodule EventSourcing.AggregatesTest do
     } do
       EventHandler.register_handler(Incremented, EventHandlerMock)
 
-      {event, aggregate} = Aggregates.execute_command(aggregate, command, context)
+      {event, _aggregate} = Aggregate.execute_command(aggregate, command, context)
 
-      assert_receive {:event_handler_called, ^event, ^aggregate}
+      assert_receive {:event_handler_called, ^event, %Counter{}}
     end
   end
 
   defp aggregate(_) do
-    aggregate = {Counter, UUID.generate()}
+    mod = Counter
+    uuid = UUID.generate()
+    aggregate = {mod, uuid}
+    opts = [aggregate_mod: mod, aggregate_uuid: uuid, event_store: EventStoreMock]
 
-    {:ok, _} =
-      start_supervised({Aggregates.Aggregate, {aggregate, [store: EventStoreMock]}}, id: aggregate)
+    {:ok, _} = start_supervised({AggregateServer, opts}, id: aggregate)
 
     {:ok, aggregate: aggregate}
   end
