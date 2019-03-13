@@ -1,5 +1,6 @@
 defmodule EventSourcing.Aggregate do
   alias EventSourcing.Aggregate.AggregateSupervisor
+  alias Ecto.UUID
 
   @registry EventSourcing.AggregateRegistry
 
@@ -18,6 +19,7 @@ defmodule EventSourcing.Aggregate do
 
   def execute_command({_mod, _uuid} = aggregate, command, context) do
     {:ok, pid} = get_aggregate(aggregate)
+    {command, context} = prepare_command(command, context)
     GenServer.call(pid, {:execute, command, context})
   end
 
@@ -26,5 +28,13 @@ defmodule EventSourcing.Aggregate do
       [{pid, _}] -> {:ok, pid}
       _ -> AggregateSupervisor.start_aggregate(aggregate)
     end
+  end
+
+  defp prepare_command(%{uuid: nil} = command, context) do
+    prepare_command(%{command | uuid: UUID.generate()}, context)
+  end
+
+  defp prepare_command(%{uuid: uuid} = command, context) do
+    {command, %{context | command_uuid: uuid}}
   end
 end

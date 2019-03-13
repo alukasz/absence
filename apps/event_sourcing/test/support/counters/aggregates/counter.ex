@@ -6,8 +6,9 @@ defmodule EventSourcing.Counters.Aggregates.Counter do
 
   defstruct [:uuid, value: 0]
 
-  def execute(%__MODULE__{} = counter, %Increment{test_pid: pid}) do
+  def execute(%__MODULE__{} = counter, %Increment{test_pid: pid} = command) do
     send(pid, {:aggregate_called, __MODULE__})
+    send(pid, {:aggregate_called, __MODULE__, command})
     %Incremented{counter_uuid: counter.uuid, test_pid: pid}
   end
 
