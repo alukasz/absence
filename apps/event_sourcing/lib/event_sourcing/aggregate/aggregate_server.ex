@@ -12,6 +12,7 @@ defmodule EventSourcing.Aggregate.AggregateServer do
   ]
 
   @registry EventSourcing.AggregateRegistry
+  @event_store Application.get_env(:event_sourcing, :event_store)
 
   def start_link(opts) do
     GenServer.start_link(__MODULE__, opts, name: name(opts))
@@ -32,7 +33,7 @@ defmodule EventSourcing.Aggregate.AggregateServer do
     state = %__MODULE__{
       aggregate_uuid: Keyword.fetch!(opts, :aggregate_uuid),
       aggregate_mod: Keyword.fetch!(opts, :aggregate_mod),
-      store_mod: Keyword.get(opts, :event_store, EventSourcing.EventStore.AgentEventStore)
+      store_mod: Keyword.get(opts, :event_store, @event_store)
     }
 
     {:ok, state, {:continue, :build_aggregate}}
