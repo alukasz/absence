@@ -5,7 +5,7 @@
 use Mix.Config
 
 # Configure your database
-config :absence, Absence.Repo,
+config :event_sourcing, EventSourcing.EventStore.Repo,
   username: "postgres",
   password: "postgres",
   database: "absence_dev",

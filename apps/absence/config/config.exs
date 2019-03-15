@@ -4,7 +4,4 @@
 # the umbrella root.
 use Mix.Config
 
-config :absence,
-  ecto_repos: [Absence.Repo]
-
 import_config "#{Mix.env()}.exs"
