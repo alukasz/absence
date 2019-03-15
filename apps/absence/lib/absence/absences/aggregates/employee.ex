@@ -12,6 +12,7 @@ defmodule Absence.Absences.Aggregates.Employee do
 
   defstruct [
     :uuid,
+    team_leader_uuid: nil,
     hours: 0,
     pending_timeoff_requests: []
   ]
