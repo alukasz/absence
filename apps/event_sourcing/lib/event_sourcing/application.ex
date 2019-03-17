@@ -7,6 +7,7 @@ defmodule EventSourcing.Application do
     children = [
       EventSourcing.Aggregate.AggregateSupervisor,
       EventSourcing.EventHandler,
+      EventSourcing.EventStore.Repo,
       {Registry, keys: :unique, name: EventSourcing.AggregateRegistry}
     ]
 
