@@ -9,4 +9,11 @@ defmodule Absence.Factory.AggregateFactory do
       hours: 80
     }
   end
+
+  def team_leader_factory do
+    %Aggregates.TeamLeader{
+      uuid: :rand.uniform(10000),
+      employee_uuid: :rand.uniform(10000)
+    }
+  end
 end

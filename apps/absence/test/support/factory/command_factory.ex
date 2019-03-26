@@ -21,4 +21,12 @@ defmodule Absence.Factory.CommandFactory do
       end_date: ~D[2019-01-10]
     }
   end
+
+  def approve_timeoff_request_factory do
+    %Commands.ApproveTimeoffRequest{}
+  end
+
+  def reject_timeoff_request_factory do
+    %Commands.RejectTimeoffRequest{}
+  end
 end

@@ -3,6 +3,9 @@ defmodule Absence.Absences.Aggregates.TeamLeaderTest do
 
   import Absence.Factory
 
+  alias Absence.Absences.Aggregates.TeamLeader
+  alias Absence.Absences.Events.TimeoffRequestApproved
+  alias Absence.Absences.Events.TimeoffRequestRejected
   alias Absence.Absences.TimeoffRequest
 
   setup do
@@ -29,13 +32,13 @@ defmodule Absence.Absences.Aggregates.TeamLeaderTest do
         build_command(:approve_timeoff_request,
           employee_uuid: employee.uuid,
           team_leader_uuid: team_leader.uuid,
-          timeoff_request_uuid: timeoff_request.uuid
+          timeoff_request: timeoff_request
         )
 
-      assert TeamLeader.execute(team_leader, command) = %TimeoffRequestApproved{
+      assert TeamLeader.execute(team_leader, command) == %TimeoffRequestApproved{
                employee_uuid: employee.uuid,
                team_leader_uuid: team_leader.uuid,
-               timeoff_request_uuid: timeoff_request.uuid
+               timeoff_request: timeoff_request
              }
     end
   end
@@ -47,16 +50,16 @@ defmodule Absence.Absences.Aggregates.TeamLeaderTest do
       timeoff_request: timeoff_request
     } do
       command =
-        build_command(:approve_timeoff_request,
+        build_command(:reject_timeoff_request,
           employee_uuid: employee.uuid,
           team_leader_uuid: team_leader.uuid,
-          timeoff_request_uuid: timeoff_request.uuid
+          timeoff_request: timeoff_request
         )
 
-      assert TeamLeader.execute(team_leader, command) = %TimeoffRequestRejected{
+      assert TeamLeader.execute(team_leader, command) == %TimeoffRequestRejected{
                employee_uuid: employee.uuid,
                team_leader_uuid: team_leader.uuid,
-               timeoff_request_uuid: timeoff_request.uuid
+               timeoff_request: timeoff_request
              }
     end
   end
