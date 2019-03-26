@@ -4,8 +4,13 @@ defmodule EventSourcing.EventStore.AgentEventStoreTest do
   alias EventSourcing.EventStore.AgentEventStore
   alias EventSourcing.Counters.Events.Incremented
 
-  setup do
+  setup_all do
     start_supervised(AgentEventStore)
+    :ok
+  end
+
+  setup do
+    Agent.update(AgentEventStore, fn _ -> {1, %{}} end)
     uuid = Ecto.UUID.generate()
     event = %Incremented{uuid: Ecto.UUID.generate()}
     {:ok, uuid: uuid, event: event}
@@ -28,6 +33,19 @@ defmodule EventSourcing.EventStore.AgentEventStoreTest do
       AgentEventStore.put(uuid, event2)
 
       assert AgentEventStore.get(uuid) == [event1, event2]
+    end
+  end
+
+  describe "next_event_number/0" do
+    test "returns 1 for first event" do
+      assert AgentEventStore.next_event_number() == 1
+    end
+
+    test "returns number of events + 1", %{uuid: uuid} do
+      AgentEventStore.next_event_number()
+      AgentEventStore.next_event_number()
+
+      assert AgentEventStore.next_event_number() == 3
     end
   end
 end
