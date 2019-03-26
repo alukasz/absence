@@ -37,6 +37,7 @@ defmodule EventSourcing.EventStore.EctoEventStore do
   def get(stream_id) do
     from(e in StoredEvent)
     |> where([e], e.stream_id == ^stream_id)
+    |> order_by([e], asc: e.event_number)
     |> Repo.all()
     |> decode_events()
   end

@@ -41,7 +41,7 @@ defmodule EventSourcing.EventStore.AgentEventStoreTest do
       assert AgentEventStore.next_event_number() == 1
     end
 
-    test "returns number of events + 1", %{uuid: uuid} do
+    test "returns number of events + 1" do
       AgentEventStore.next_event_number()
       AgentEventStore.next_event_number()
 

@@ -20,8 +20,6 @@ defmodule EventSourcing.EventStore.EctoEventStoreTest do
       assert EctoEventStore.get(stream_id) == [event]
     end
 
-    # TODO implement events ordering
-    @tag :skip
     test "stores multiple events", %{stream_id: stream_id, event: event} do
       assert EctoEventStore.get(stream_id) == []
 
