@@ -9,4 +9,11 @@ defmodule Absence.Factory.AggregateFactory do
       hours: 80
     }
   end
+
+  def team_leader_factory do
+    %Aggregates.TeamLeader{
+      uuid: EventSourcing.UUID.generate(),
+      employee_uuid: EventSourcing.UUID.generate()
+    }
+  end
 end

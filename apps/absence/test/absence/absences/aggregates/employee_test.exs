@@ -72,8 +72,7 @@ defmodule Absence.Absences.Aggregates.EmployeeTest do
       }
 
       assert %{pending_timeoff_requests: [actual_request]} = Employee.apply(employee, event)
-
-      assert_timeoff_request(expected_request, actual_request)
+      assert expected_request == actual_request
     end
 
     test "2 TimeoffRequested events add 2 TimeoffRequest to pending timeoff requests", %{
@@ -96,18 +95,8 @@ defmodule Absence.Absences.Aggregates.EmployeeTest do
       ]
 
       employee = Employee.apply(employee, event1)
-
       assert %{pending_timeoff_requests: actual_requests} = Employee.apply(employee, event2)
-
-      expected_requests
-      |> Enum.zip(actual_requests)
-      |> Enum.each(fn {expected, actual} -> assert_timeoff_request(expected, actual) end)
+      assert expected_requests == actual_requests
     end
-  end
-
-  defp assert_timeoff_request(expected, actual) do
-    assert expected.employee_uuid == actual.employee_uuid
-    assert expected.start_date == actual.start_date
-    assert expected.end_date == actual.end_date
   end
 end

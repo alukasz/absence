@@ -21,4 +21,12 @@ defmodule Absence.Factory.EventFactory do
       end_date: ~D[2019-01-10]
     }
   end
+
+  def timeoff_request_approved_factory do
+    %Events.TimeoffRequestApproved{}
+  end
+
+  def timeoff_request_rejected_factory do
+    %Events.TimeoffRequestRejected{}
+  end
 end
