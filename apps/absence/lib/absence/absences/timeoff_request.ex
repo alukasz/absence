@@ -11,6 +11,6 @@ defmodule Absence.Absences.TimeoffRequest do
   def from_event(event) do
     TimeoffRequest
     |> struct(Map.from_struct(event))
-    |> Map.put(:uuid, Ecto.UUID.generate())
+    |> Map.put(:uuid, EventSourcing.UUID.generate())
   end
 end
