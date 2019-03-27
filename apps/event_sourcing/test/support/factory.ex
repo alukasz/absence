@@ -5,11 +5,11 @@ defmodule EventSourcing.Factory do
   alias EventSourcing.Counters.Events.Incremented
 
   def stored_event_factory do
-    event_id = Ecto.UUID.generate()
+    event_id = EventSourcing.UUID.generate()
 
     %StoredEvent{
       event_id: event_id,
-      stream_id: Ecto.UUID.generate(),
+      stream_id: EventSourcing.UUID.generate(),
       event_name: Atom.to_string(Incremented),
       event_data: %Incremented{uuid: event_id},
       event_number: sequence(:event_number, & &1)

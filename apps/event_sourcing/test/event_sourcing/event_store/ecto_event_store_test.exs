@@ -8,13 +8,13 @@ defmodule EventSourcing.EventStore.EctoEventStoreTest do
 
   setup do
     {:ok, _} = start_supervised(EctoEventStore)
-    stream_id = Ecto.UUID.generate()
+    stream_id = EventSourcing.UUID.generate()
     {:ok, stream_id: stream_id}
   end
 
   describe "put/2" do
     setup %{stream_id: stream_id} do
-      event = %Incremented{uuid: Ecto.UUID.generate(), counter_uuid: stream_id}
+      event = %Incremented{uuid: EventSourcing.UUID.generate(), counter_uuid: stream_id}
       {:ok, event: event}
     end
 
