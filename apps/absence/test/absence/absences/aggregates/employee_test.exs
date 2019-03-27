@@ -99,7 +99,8 @@ defmodule Absence.Absences.Aggregates.EmployeeTest do
 
       assert %{pending_timeoff_requests: actual_requests} = Employee.apply(employee, event2)
 
-      Enum.zip(expected_requests, actual_requests)
+      expected_requests
+      |> Enum.zip(actual_requests)
       |> Enum.each(fn {expected, actual} -> assert_timeoff_request(expected, actual) end)
     end
   end

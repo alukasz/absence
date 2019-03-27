@@ -5,7 +5,7 @@ defmodule Absence.Factory.AggregateFactory do
 
   def employee_factory do
     %Aggregates.Employee{
-      uuid: :rand.uniform(10000),
+      uuid: EventSourcing.UUID.generate(),
       hours: 80
     }
   end
