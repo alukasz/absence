@@ -6,8 +6,8 @@ defmodule EventSourcing.EventStore.AgentEventStoreTest do
 
   setup do
     start_supervised(AgentEventStore)
-    uuid = Ecto.UUID.generate()
-    event = %Incremented{uuid: Ecto.UUID.generate()}
+    uuid = EventSourcing.UUID.generate()
+    event = %Incremented{uuid: EventSourcing.UUID.generate()}
     {:ok, uuid: uuid, event: event}
   end
 
@@ -22,8 +22,8 @@ defmodule EventSourcing.EventStore.AgentEventStoreTest do
     test "stores multiple events", %{uuid: uuid} do
       assert AgentEventStore.get(uuid) == []
 
-      event1 = %Incremented{uuid: Ecto.UUID.generate()}
-      event2 = %Incremented{uuid: Ecto.UUID.generate()}
+      event1 = %Incremented{uuid: EventSourcing.UUID.generate()}
+      event2 = %Incremented{uuid: EventSourcing.UUID.generate()}
       AgentEventStore.put(uuid, event1)
       AgentEventStore.put(uuid, event2)
 
