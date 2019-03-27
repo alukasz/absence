@@ -12,8 +12,8 @@ defmodule Absence.Factory.AggregateFactory do
 
   def team_leader_factory do
     %Aggregates.TeamLeader{
-      uuid: :rand.uniform(10000),
-      employee_uuid: :rand.uniform(10000)
+      uuid: EventSourcing.UUID.generate(),
+      employee_uuid: EventSourcing.UUID.generate()
     }
   end
 end
