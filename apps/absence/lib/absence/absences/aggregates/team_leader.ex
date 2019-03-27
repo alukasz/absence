@@ -6,7 +6,6 @@ defmodule Absence.Absences.Aggregates.TeamLeader do
   alias Absence.Absences.Commands.RejectTimeoffRequest
   alias Absence.Absences.Events.TimeoffRequestApproved
   alias Absence.Absences.Events.TimeoffRequestRejected
-  alias Absence.Absences.TimeoffRequest
 
   defstruct [
     :uuid,
