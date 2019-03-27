@@ -1,3 +1,3 @@
 defmodule EventSourcing.UUIDGenerator do
-  @callback generate() :: Ecto.UUID.t() | nil
+  @callback generate() :: EventSourcing.UUID.t() | nil
 end

@@ -1,7 +1,7 @@
 defmodule EventSourcing.DispatcherTest do
   use ExUnit.Case
 
-  alias Ecto.UUID
+  alias EventSourcing.UUID
   alias EventSourcing.Counters.Aggregates.Counter
   alias EventSourcing.Counters.Commands.Increment
   alias EventSourcing.Counters.Commands.Decrement

@@ -1,8 +1,8 @@
 defmodule EventSourcing.UUID do
   @behaviour EventSourcing.UUIDGenerator
 
-  alias Ecto.UUID
+  @type t :: Ecto.UUID.t()
 
-  @impl UUIDGenerator
-  def generate(), do: UUID.generate()
+  @impl true
+  def generate(), do: Ecto.UUID.generate()
 end

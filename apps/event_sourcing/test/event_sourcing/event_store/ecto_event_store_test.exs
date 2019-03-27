@@ -5,8 +5,8 @@ defmodule EventSourcing.EventStore.EctoEventStoreTest do
   alias EventSourcing.Counters.Events.Incremented
 
   setup do
-    stream_id = Ecto.UUID.generate()
-    event = %Incremented{uuid: Ecto.UUID.generate(), counter_uuid: stream_id}
+    stream_id = EventSourcing.UUID.generate()
+    event = %Incremented{uuid: EventSourcing.UUID.generate(), counter_uuid: stream_id}
     {:ok, stream_id: stream_id, event: event}
   end
 
@@ -23,8 +23,8 @@ defmodule EventSourcing.EventStore.EctoEventStoreTest do
     test "stores multiple events", %{stream_id: stream_id, event: event} do
       assert EctoEventStore.get(stream_id) == []
 
-      event1 = %Incremented{event | uuid: Ecto.UUID.generate()}
-      event2 = %Incremented{event | uuid: Ecto.UUID.generate()}
+      event1 = %Incremented{event | uuid: EventSourcing.UUID.generate()}
+      event2 = %Incremented{event | uuid: EventSourcing.UUID.generate()}
       EctoEventStore.put(stream_id, event1)
       EctoEventStore.put(stream_id, event2)
 

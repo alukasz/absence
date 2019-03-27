@@ -1,12 +1,12 @@
 defmodule EventSourcing.Aggregate do
   alias EventSourcing.Aggregate.AggregateSupervisor
-  alias Ecto.UUID
+  alias EventSourcing.UUID
 
   @registry EventSourcing.AggregateRegistry
 
   @type struct_with_uuid :: %{
           :__struct__ => module,
-          :uuid => Ecto.UUID.t(),
+          :uuid => EventSourcing.UUID.t(),
           optional(atom) => any
         }
   @type aggregate :: struct_with_uuid
