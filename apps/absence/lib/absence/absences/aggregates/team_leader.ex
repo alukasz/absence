@@ -30,21 +30,13 @@ defmodule Absence.Absences.Aggregates.TeamLeader do
     }
   end
 
-  def apply(%TeamLeader{} = team_leader, %TimeoffRequestApproved{
-        timeoff_request: timeoff_request
-      }) do
-    %{
-      team_leader
-      | approved_timeoff_requests: [timeoff_request | team_leader.approved_timeoff_requests]
-    }
+  def apply(%TeamLeader{} = team_leader, %TimeoffRequestApproved{} = timeoff_request_approved) do
+    %TimeoffRequestApproved{timeoff_request: timeoff_request} = timeoff_request_approved
+    update_in(team_leader.approved_timeoff_requests, &[timeoff_request | &1])
   end
 
-  def apply(%TeamLeader{} = team_leader, %TimeoffRequestRejected{
-        timeoff_request: timeoff_request
-      }) do
-    %{
-      team_leader
-      | rejected_timeoff_requests: [timeoff_request | team_leader.rejected_timeoff_requests]
-    }
+  def apply(%TeamLeader{} = team_leader, %TimeoffRequestRejected{} = timeoff_request_rejected) do
+    %TimeoffRequestRejected{timeoff_request: timeoff_request} = timeoff_request_rejected
+    update_in(team_leader.rejected_timeoff_requests, &[timeoff_request | &1])
   end
 end
