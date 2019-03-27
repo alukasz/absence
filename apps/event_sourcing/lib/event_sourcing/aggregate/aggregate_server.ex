@@ -2,17 +2,18 @@ defmodule EventSourcing.Aggregate.AggregateServer do
   use GenServer
 
   alias EventSourcing.EventHandler
-  alias Ecto.UUID
 
   defstruct [
     :aggregate_uuid,
     :aggregate_mod,
     :aggregate_state,
-    :store_mod
+    :store_mod,
+    :uuid_generator_mod
   ]
 
   @registry EventSourcing.AggregateRegistry
   @event_store Application.get_env(:event_sourcing, :event_store)
+  @uuid_generator Application.get_env(:event_sourcing, :uuid_generator)
 
   def start_link(opts) do
     GenServer.start_link(__MODULE__, opts, name: name(opts))
@@ -33,7 +34,8 @@ defmodule EventSourcing.Aggregate.AggregateServer do
     state = %__MODULE__{
       aggregate_uuid: Keyword.fetch!(opts, :aggregate_uuid),
       aggregate_mod: Keyword.fetch!(opts, :aggregate_mod),
-      store_mod: Keyword.get(opts, :event_store, @event_store)
+      store_mod: Keyword.get(opts, :event_store, @event_store),
+      uuid_generator_mod: Keyword.get(opts, :uuid_generator, @uuid_generator)
     }
 
     {:ok, state, {:continue, :build_aggregate}}
@@ -61,7 +63,7 @@ defmodule EventSourcing.Aggregate.AggregateServer do
 
     event =
       case aggregate_mod.execute(aggregate_state, command) do
-        %{uuid: nil} = event -> %{event | uuid: UUID.generate()}
+        %{uuid: nil} = event -> %{event | uuid: state.uuid_generator_mod.generate()}
         event -> event
       end
 

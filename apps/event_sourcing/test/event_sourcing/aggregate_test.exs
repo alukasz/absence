@@ -5,12 +5,12 @@ defmodule EventSourcing.AggregateTest do
   alias EventSourcing.Aggregate.AggregateServer
   alias EventSourcing.Context
   alias EventSourcing.EventHandler
-  alias Ecto.UUID
   alias EventSourcing.Counters.Aggregates.Counter
   alias EventSourcing.Counters.Commands.Increment
   alias EventSourcing.Counters.Events.Incremented
   alias EventSourcing.EventStore.EventStoreMock
   alias EventSourcing.EventHandlerMock
+  alias EventSourcing.UUID
 
   @registry EventSourcing.AggregateRegistry
 
@@ -114,7 +114,13 @@ defmodule EventSourcing.AggregateTest do
     mod = Counter
     uuid = UUID.generate()
     aggregate = {mod, uuid}
-    opts = [aggregate_mod: mod, aggregate_uuid: uuid, event_store: EventStoreMock]
+
+    opts = [
+      aggregate_mod: mod,
+      aggregate_uuid: uuid,
+      event_store: EventStoreMock,
+      uuid_generator: UUID
+    ]
 
     {:ok, _} = start_supervised({AggregateServer, opts}, id: aggregate)
 
@@ -122,7 +128,7 @@ defmodule EventSourcing.AggregateTest do
   end
 
   defp command(_) do
-    command = %Increment{uuid: Ecto.UUID.generate(), test_pid: self()}
+    command = %Increment{uuid: UUID.generate(), test_pid: self()}
 
     {:ok, command: command}
   end
