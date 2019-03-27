@@ -11,7 +11,7 @@
       color: true,
       checks: [
         {Credo.Check.Readability.ModuleDoc, false},
-        {Credo.Check.Refactor.PipeChainStart, false},
+        {Credo.Check.Refactor.PipeChainStart, false}
       ]
     }
   ]
