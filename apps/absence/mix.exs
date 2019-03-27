@@ -12,7 +12,6 @@ defmodule Absence.MixProject do
       elixir: "~> 1.8",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
-      aliases: aliases(),
       deps: deps()
     ]
   end
@@ -29,19 +28,8 @@ defmodule Absence.MixProject do
 
   defp deps do
     [
-      {:ecto_sql, "~> 3.0"},
-      {:postgrex, ">= 0.0.0"},
-      {:jason, "~> 1.0"},
       {:ex_machina, "~> 2.2", only: :test},
       {:event_sourcing, in_umbrella: true}
-    ]
-  end
-
-  defp aliases do
-    [
-      "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
-      "ecto.reset": ["ecto.drop", "ecto.setup"],
-      test: ["ecto.create --quiet", "ecto.migrate", "test"]
     ]
   end
 end
