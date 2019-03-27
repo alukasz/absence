@@ -30,6 +30,7 @@ defmodule EventSourcing.MixProject do
   defp deps do
     [
       {:ecto_sql, "~> 3.0"},
+      {:ex_machina, "~> 2.2", only: :test},
       {:postgrex, ">= 0.0.0"},
       {:jason, "~> 1.0"}
     ]
