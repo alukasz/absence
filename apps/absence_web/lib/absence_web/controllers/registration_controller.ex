@@ -1,16 +1,16 @@
 defmodule AbsenceWeb.RegistrationController do
   use AbsenceWeb, :controller
 
-  alias Absence.Accounts
+  @accounts Application.get_env(:absence_web, :accounts)
 
   plug :scrub_params, "user" when action == :create
 
   def new(conn, _params) do
-    render(conn, "new.html", user: Accounts.user_changeset())
+    render(conn, "new.html", user: @accounts.user_changeset())
   end
 
   def create(conn, %{"user" => user_params}) do
-    case Accounts.register(user_params) do
+    case @accounts.register(user_params) do
       {:ok, _user} ->
         conn
         |> put_flash(:info, "Registration successful")

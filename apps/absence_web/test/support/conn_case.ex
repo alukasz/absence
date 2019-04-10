@@ -19,6 +19,7 @@ defmodule AbsenceWeb.ConnCase do
     quote do
       # Import conveniences for testing with connections
       use Phoenix.ConnTest
+      import AbsenceWeb.ConnCase
       alias AbsenceWeb.Router.Helpers, as: Routes
 
       # The default endpoint for testing
@@ -34,5 +35,11 @@ defmodule AbsenceWeb.ConnCase do
     end
 
     {:ok, conn: Phoenix.ConnTest.build_conn()}
+  end
+
+  def escape_string(string) do
+    string
+    |> Phoenix.HTML.html_escape()
+    |> Phoenix.HTML.safe_to_string()
   end
 end

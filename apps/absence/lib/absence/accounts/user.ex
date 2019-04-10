@@ -3,6 +3,8 @@ defmodule Absence.Accounts.User do
 
   import Ecto.Changeset
 
+  @type t :: struct
+
   schema "users" do
     field :first_name, :string
     field :last_name, :string
