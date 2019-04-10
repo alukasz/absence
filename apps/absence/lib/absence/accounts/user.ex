@@ -20,12 +20,12 @@ defmodule Absence.Accounts.User do
     :password
   ]
 
-  def insert_changeset(schema, params) do
-    schema
+  def insert_changeset(params) do
+    %__MODULE__{}
     |> cast(params, @params)
     |> validate_required(@params)
     |> unique_constraint(:email)
-    |> validate_confirmation(:password)
+    |> validate_confirmation(:password, message: "does not match")
     |> hash_password()
   end
 

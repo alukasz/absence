@@ -8,16 +8,6 @@ defmodule AbsenceWeb.RegistrationControllerTest do
   alias Absence.Accounts.User
   alias Ecto.Changeset
 
-  @email "registration@example.com"
-  @password "P@ssw0rd"
-  @valid_params %{
-    "first_name" => "John",
-    "last_name" => "Doe",
-    "email" => @email,
-    "password" => @password,
-    "password_confirmation" => @password
-  }
-
   setup :verify_on_exit!
 
   describe "#new" do
@@ -36,9 +26,10 @@ defmodule AbsenceWeb.RegistrationControllerTest do
 
   describe "#create with valid params" do
     test "creates a new user", %{conn: conn} do
-      expect(AccountsMock, :register, 1, fn @valid_params -> {:ok, %User{}} end)
+      params = Absence.Factory.string_params_for(:user)
+      expect(AccountsMock, :register, 1, fn ^params -> {:ok, %User{}} end)
 
-      conn = post(conn, registration_path(conn, :create), %{user: @valid_params})
+      conn = post(conn, registration_path(conn, :create), %{user: params})
 
       assert redirected_to(conn) == page_path(conn, :index)
       assert get_flash(conn, :info) =~ "Registration successful"
@@ -51,7 +42,7 @@ defmodule AbsenceWeb.RegistrationControllerTest do
         %User{}
         |> Changeset.change()
         |> Changeset.add_error(:first_name, "can't be blank")
-        |> Changeset.add_error(:password_confirmation, "does not match confirmation")
+        |> Changeset.add_error(:password_confirmation, "does not match")
         |> Changeset.apply_action(:insert)
 
       expect(AccountsMock, :register, 1, fn _ -> {:error, changeset} end)
@@ -68,7 +59,7 @@ defmodule AbsenceWeb.RegistrationControllerTest do
     test "renders form errors", %{conn: conn} do
       conn = post(conn, registration_path(conn, :create), %{user: %{}})
 
-      assert html_response(conn, 200) =~ "does not match confirmation"
+      assert html_response(conn, 200) =~ "does not match"
       assert html_response(conn, 200) =~ escape_string("can't be blank")
     end
   end

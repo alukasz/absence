@@ -56,7 +56,7 @@ defmodule Absence.AccountsTest do
       assert {:error, changeset} =
                Accounts.register(params_for(:user, password: "a", password_confirmation: "b"))
 
-      assert "does not match confirmation" in errors_on(changeset).password_confirmation
+      assert "does not match" in errors_on(changeset).password_confirmation
     end
   end
 end

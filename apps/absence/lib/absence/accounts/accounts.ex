@@ -13,8 +13,8 @@ defmodule Absence.Accounts do
 
   @impl Contract
   def register(user_params) do
-    %User{}
-    |> User.insert_changeset(user_params)
+    user_params
+    |> User.insert_changeset()
     |> Repo.insert()
   end
 end
