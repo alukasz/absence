@@ -9,3 +9,7 @@ use Mix.Config
 config :absence_web, AbsenceWeb.Endpoint,
   http: [port: 4002],
   server: false
+
+config :argon2_elixir,
+  t_cost: 1,
+  m_cost: 8
