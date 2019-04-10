@@ -27,13 +27,7 @@ defmodule AbsenceWeb.ConnCase do
     end
   end
 
-  setup tags do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Absence.Repo)
-
-    unless tags[:async] do
-      Ecto.Adapters.SQL.Sandbox.mode(Absence.Repo, {:shared, self()})
-    end
-
+  setup _ do
     {:ok, conn: Phoenix.ConnTest.build_conn()}
   end
 
