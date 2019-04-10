@@ -24,6 +24,14 @@ defmodule Absence.AccountsTest do
 
       assert Repo.get(User, user.id)
     end
+
+    test "password is hashed" do
+      params = params_for(:user)
+
+      assert {:ok, %User{} = user} = Accounts.register(params)
+
+      assert Argon2.check_pass(user.password, params.password)
+    end
   end
 
   describe "register/1 with invalid params" do
