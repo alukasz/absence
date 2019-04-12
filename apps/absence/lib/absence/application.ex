@@ -4,7 +4,9 @@ defmodule Absence.Application do
   use Application
 
   def start(_type, _args) do
-    children = []
+    children = [
+      Absence.Repo
+    ]
 
     opts = [strategy: :one_for_one, name: Absence.Supervisor]
     Supervisor.start_link(children, opts)
