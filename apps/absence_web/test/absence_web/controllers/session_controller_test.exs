@@ -7,7 +7,12 @@ defmodule AbsenceWeb.SessionControllerTest do
   alias Absence.AccountsMock
   alias Absence.Accounts.User
 
-  @params Absence.Factory.string_params_for(:user) |> Map.take(["email", "password"])
+  @email "test@example.com"
+  @password "P@ssw0rd"
+  @params %{
+    "email" => @email,
+    "password" => @password
+  }
   @user_id 42
 
   describe "#new" do
@@ -24,7 +29,7 @@ defmodule AbsenceWeb.SessionControllerTest do
     setup :verify_on_exit!
 
     setup do
-      expect(AccountsMock, :authenticate_email_password, 1, fn _, _ ->
+      expect(AccountsMock, :authenticate_email_password, 1, fn @email, @password ->
         {:ok, %User{id: @user_id}}
       end)
 
@@ -51,7 +56,9 @@ defmodule AbsenceWeb.SessionControllerTest do
     setup :verify_on_exit!
 
     setup do
-      expect(AccountsMock, :authenticate_email_password, 1, fn _, _ -> :error end)
+      expect(AccountsMock, :authenticate_email_password, 1, fn @email, @password ->
+        :error
+      end)
 
       :ok
     end
