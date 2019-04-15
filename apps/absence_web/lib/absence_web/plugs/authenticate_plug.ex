@@ -17,6 +17,7 @@ defmodule AbsenceWeb.AuthenticatePlug do
   end
 
   defp decode_token(nil), do: nil
+
   defp decode_token(token) do
     case Phoenix.Token.verify(AbsenceWeb.Endpoint, "session", token, max_age: @token_max_age) do
       {:ok, user_id} -> user_id
@@ -25,6 +26,7 @@ defmodule AbsenceWeb.AuthenticatePlug do
   end
 
   defp get_user(nil), do: nil
+
   defp get_user(user_id) do
     @accounts.get_user(user_id)
   end
