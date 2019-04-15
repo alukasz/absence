@@ -6,8 +6,6 @@ defmodule AbsenceWeb.SessionController do
   @accounts Application.get_env(:absence_web, :accounts)
   @token_max_age 60 * 60 * 24
 
-  plug :scrub_params, "session" when action == :create
-
   def new(conn, _params) do
     render(conn, "new.html")
   end
@@ -17,7 +15,7 @@ defmodule AbsenceWeb.SessionController do
       {:ok, %User{} = user} ->
         conn
         |> put_user_in_session(user)
-        |> put_flash(:success, "Authenticated successfully")
+        |> put_flash(:info, "Authenticated successfully")
         |> redirect(to: Routes.page_path(conn, :index))
 
       :error ->
