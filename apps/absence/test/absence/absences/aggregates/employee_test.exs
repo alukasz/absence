@@ -7,12 +7,13 @@ defmodule Absence.Absences.Aggregates.EmployeeTest do
   alias Absence.Absences.Events.HoursAdded
   alias Absence.Absences.Events.HoursRemoved
   alias Absence.Absences.Events.TimeoffRequested
-  alias Absence.Absences.TimeoffRequest
 
   setup do
     employee = build_aggregate(:employee)
+    team_leader = build_aggregate(:team_leader)
+    timeoff_request = build_entity(:timeoff_request) |> with_employee(employee)
 
-    {:ok, employee: employee}
+    {:ok, employee: employee, team_leader: team_leader, timeoff_request: timeoff_request}
   end
 
   describe "adding hours" do
@@ -26,7 +27,7 @@ defmodule Absence.Absences.Aggregates.EmployeeTest do
     end
 
     test "HoursAdded events increases hours of aggregate", %{employee: employee} do
-      event = build_event(:hours_added, employee_uuid: employee.uuid)
+      event = build_event(:hours_added) |> with_employee(employee)
 
       assert Employee.apply(employee, event) == %{employee | hours: employee.hours + event.hours}
     end
@@ -43,7 +44,7 @@ defmodule Absence.Absences.Aggregates.EmployeeTest do
     end
 
     test "HoursRemoved events decreases hours of aggregate", %{employee: employee} do
-      event = build_event(:hours_removed, employee_uuid: employee.uuid)
+      event = build_event(:hours_removed) |> with_employee(employee)
 
       assert Employee.apply(employee, event) == %{employee | hours: employee.hours - event.hours}
     end
@@ -61,42 +62,87 @@ defmodule Absence.Absences.Aggregates.EmployeeTest do
     end
 
     test "TimeoffRequested event adds TimeoffRequest to pending timeoff requests", %{
-      employee: employee
+      employee: employee,
+      timeoff_request: expected_request
     } do
-      event = build_event(:timeoff_requested, employee_uuid: employee.uuid)
+      event = build_event(:timeoff_requested) |> with_employee(employee)
 
-      expected_request = %TimeoffRequest{
-        employee_uuid: employee.uuid,
-        start_date: event.start_date,
-        end_date: event.end_date
-      }
-
-      assert %{pending_timeoff_requests: [actual_request]} = Employee.apply(employee, event)
-      assert expected_request == actual_request
+      assert %{pending_timeoff_requests: [^expected_request]} = Employee.apply(employee, event)
     end
 
     test "2 TimeoffRequested events add 2 TimeoffRequest to pending timeoff requests", %{
-      employee: employee
+      employee: employee,
+      timeoff_request: timeoff_request
     } do
-      event1 = build_event(:timeoff_requested, employee_uuid: employee.uuid)
-      event2 = build_event(:timeoff_requested, employee_uuid: employee.uuid)
+      event1 = build_event(:timeoff_requested) |> with_employee(employee)
+      event2 = build_event(:timeoff_requested) |> with_employee(employee)
 
-      expected_requests = [
-        %TimeoffRequest{
-          employee_uuid: employee.uuid,
-          start_date: event2.start_date,
-          end_date: event2.end_date
-        },
-        %TimeoffRequest{
-          employee_uuid: employee.uuid,
-          start_date: event1.start_date,
-          end_date: event1.end_date
-        }
-      ]
+      expected_requests = [timeoff_request, timeoff_request]
 
       employee = Employee.apply(employee, event1)
-      assert %{pending_timeoff_requests: actual_requests} = Employee.apply(employee, event2)
-      assert expected_requests == actual_requests
+      assert %{pending_timeoff_requests: ^expected_requests} = Employee.apply(employee, event2)
+    end
+  end
+
+  describe "approving timeoff requests" do
+    setup %{employee: employee, team_leader: team_leader, timeoff_request: timeoff_request} do
+      employee = %{employee | pending_timeoff_requests: [timeoff_request]}
+
+      timeoff_request_approved_event =
+        build_event(:timeoff_request_approved, timeoff_request: timeoff_request)
+        |> with_employee(employee)
+        |> with_team_leader(team_leader)
+
+      {:ok, employee: employee, timeoff_request_approved_event: timeoff_request_approved_event}
+    end
+
+    test "TimeoffRequestApproved event adds TimeoffRequest to approved timeoff requests", %{
+      employee: employee,
+      timeoff_request: timeoff_request,
+      timeoff_request_approved_event: timeoff_request_approved_event
+    } do
+      assert %{approved_timeoff_requests: [^timeoff_request], rejected_timeoff_requests: []} =
+               Employee.apply(employee, timeoff_request_approved_event)
+    end
+
+    test "TimeoffRequestApproved event removes appropriate TimeoffRequest from pending timeoff requests",
+         %{
+           employee: employee,
+           timeoff_request_approved_event: timeoff_request_approved_event
+         } do
+      assert %{pending_timeoff_requests: []} =
+               Employee.apply(employee, timeoff_request_approved_event)
+    end
+  end
+
+  describe "rejecting timeoff requests" do
+    setup %{employee: employee, team_leader: team_leader, timeoff_request: timeoff_request} do
+      employee = %{employee | pending_timeoff_requests: [timeoff_request]}
+
+      timeoff_request_rejected_event =
+        build_event(:timeoff_request_rejected, timeoff_request: timeoff_request)
+        |> with_employee(employee)
+        |> with_team_leader(team_leader)
+
+      {:ok, employee: employee, timeoff_request_rejected_event: timeoff_request_rejected_event}
+    end
+
+    test "TimeoffRequestRejected event adds TimeoffRequest to rejected timeoff requests", %{
+      employee: employee,
+      timeoff_request: timeoff_request,
+      timeoff_request_rejected_event: timeoff_request_rejected_event
+    } do
+      assert %{approved_timeoff_requests: [], rejected_timeoff_requests: [^timeoff_request]} =
+               Employee.apply(employee, timeoff_request_rejected_event)
+    end
+
+    test "TimeoffRequestRejected event removes appropriate TimeoffRequest from pending timeoff requests",
+         %{
+           employee: employee,
+           timeoff_request_rejected_event: timeoff_request_rejected_event
+         } do
+      assert %{pending_timeoff_requests: []} =
+               Employee.apply(employee, timeoff_request_rejected_event)
     end
   end
 end

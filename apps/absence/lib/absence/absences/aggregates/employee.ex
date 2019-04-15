@@ -8,13 +8,17 @@ defmodule Absence.Absences.Aggregates.Employee do
   alias Absence.Absences.Events.HoursAdded
   alias Absence.Absences.Events.HoursRemoved
   alias Absence.Absences.Events.TimeoffRequested
+  alias Absence.Absences.Events.TimeoffRequestApproved
+  alias Absence.Absences.Events.TimeoffRequestRejected
   alias Absence.Absences.TimeoffRequest
 
   defstruct [
     :uuid,
     team_leader_uuid: nil,
     hours: 0,
-    pending_timeoff_requests: []
+    pending_timeoff_requests: [],
+    approved_timeoff_requests: [],
+    rejected_timeoff_requests: []
   ]
 
   def execute(%Employee{} = employee, %AddHours{} = add_hours) do
@@ -55,5 +59,27 @@ defmodule Absence.Absences.Aggregates.Employee do
           | employee.pending_timeoff_requests
         ]
     }
+  end
+
+  def apply(%Employee{} = employee, %TimeoffRequestApproved{} = event) do
+    %TimeoffRequestApproved{timeoff_request: timeoff_request} = event
+    employee = remove_pending_timeoff_request(employee, timeoff_request.uuid)
+    update_in(employee.approved_timeoff_requests, &[timeoff_request | &1])
+  end
+
+  def apply(%Employee{} = employee, %TimeoffRequestRejected{} = event) do
+    %TimeoffRequestRejected{timeoff_request: timeoff_request} = event
+    employee = remove_pending_timeoff_request(employee, timeoff_request.uuid)
+    update_in(employee.rejected_timeoff_requests, &[timeoff_request | &1])
+  end
+
+  defp remove_pending_timeoff_request(employee, uuid) do
+    timeoff_requests =
+      Enum.reject(employee.pending_timeoff_requests, fn
+        %{uuid: ^uuid} -> true
+        _ -> false
+      end)
+
+    %{employee | pending_timeoff_requests: timeoff_requests}
   end
 end
