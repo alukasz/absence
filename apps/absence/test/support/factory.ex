@@ -15,13 +15,20 @@ defmodule Absence.Factory do
     to: Absence.Factory.EventFactory,
     as: :build
 
+  @password "P@ssw0rd"
+
   def user_factory do
     %Accounts.User{
       first_name: "Alice",
       last_name: "Doe",
       email: sequence(:user_email, &"test-#{&1}@example.com"),
-      password: "P@ssw0rd",
-      password_confirmation: "P@ssw0rd"
+      password: @password,
+      password_confirmation: @password
     }
+  end
+
+  def with_hashed_password(user, password \\ nil) do
+    hash = Argon2.hash_pwd_salt(password || user.password)
+    %{user | password: hash, password_confirmation: nil}
   end
 end
