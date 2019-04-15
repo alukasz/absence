@@ -41,22 +41,22 @@ defmodule Absence.Absences.Aggregates.TeamLeaderTest do
                timeoff_request: timeoff_request
              }
     end
-  end
 
-  test "TimeoffRequestApproved event adds TimeoffRequest to approved timeoff requests", %{
-    employee: employee,
-    team_leader: team_leader,
-    timeoff_request: timeoff_request
-  } do
-    event =
-      build_event(:timeoff_request_approved,
-        team_leader_uuid: team_leader.uuid,
-        employee_uuid: employee.uuid,
-        timeoff_request: timeoff_request
-      )
+    test "TimeoffRequestApproved event adds TimeoffRequest to approved timeoff requests", %{
+      employee: employee,
+      team_leader: team_leader,
+      timeoff_request: timeoff_request
+    } do
+      event =
+        build_event(:timeoff_request_approved,
+          team_leader_uuid: team_leader.uuid,
+          employee_uuid: employee.uuid,
+          timeoff_request: timeoff_request
+        )
 
-    assert %{approved_timeoff_requests: [timeoff_request], rejected_timeoff_requests: []} =
-             TeamLeader.apply(team_leader, event)
+      assert %{approved_timeoff_requests: [timeoff_request], rejected_timeoff_requests: []} =
+               TeamLeader.apply(team_leader, event)
+    end
   end
 
   describe "rejecting timeoff requests" do
@@ -78,21 +78,21 @@ defmodule Absence.Absences.Aggregates.TeamLeaderTest do
                timeoff_request: timeoff_request
              }
     end
-  end
 
-  test "TimeoffRequestRejected event adds TimeoffRequest to rejected timeoff requests", %{
-    employee: employee,
-    team_leader: team_leader,
-    timeoff_request: timeoff_request
-  } do
-    event =
-      build_event(:timeoff_request_rejected,
-        team_leader_uuid: team_leader.uuid,
-        employee_uuid: employee.uuid,
-        timeoff_request: timeoff_request
-      )
+    test "TimeoffRequestRejected event adds TimeoffRequest to rejected timeoff requests", %{
+      employee: employee,
+      team_leader: team_leader,
+      timeoff_request: timeoff_request
+    } do
+      event =
+        build_event(:timeoff_request_rejected,
+          team_leader_uuid: team_leader.uuid,
+          employee_uuid: employee.uuid,
+          timeoff_request: timeoff_request
+        )
 
-    assert %{approved_timeoff_requests: [], rejected_timeoff_requests: [timeoff_request]} =
-             TeamLeader.apply(team_leader, event)
+      assert %{approved_timeoff_requests: [], rejected_timeoff_requests: [timeoff_request]} =
+               TeamLeader.apply(team_leader, event)
+    end
   end
 end
