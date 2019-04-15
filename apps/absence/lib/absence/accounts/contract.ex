@@ -8,4 +8,6 @@ defmodule Absence.Accounts.Contract do
   @callback register(map) :: {:ok, User.t()} | {:error, Changeset.t()}
 
   @callback authenticate_email_password(String.t(), String.t()) :: {:ok, User.t()} | :error
+
+  @callback get_user(integer) :: User.t() | nil
 end
