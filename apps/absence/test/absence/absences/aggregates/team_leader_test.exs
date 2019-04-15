@@ -48,7 +48,7 @@ defmodule Absence.Absences.Aggregates.TeamLeaderTest do
         |> with_employee(employee)
         |> with_team_leader(team_leader)
 
-      assert %{approved_timeoff_requests: [timeoff_request], rejected_timeoff_requests: []} =
+      assert %{approved_timeoff_requests: [^timeoff_request], rejected_timeoff_requests: []} =
                TeamLeader.apply(team_leader, event)
     end
   end
@@ -81,7 +81,7 @@ defmodule Absence.Absences.Aggregates.TeamLeaderTest do
         |> with_employee(employee)
         |> with_team_leader(team_leader)
 
-      assert %{approved_timeoff_requests: [], rejected_timeoff_requests: [timeoff_request]} =
+      assert %{approved_timeoff_requests: [], rejected_timeoff_requests: [^timeoff_request]} =
                TeamLeader.apply(team_leader, event)
     end
   end
