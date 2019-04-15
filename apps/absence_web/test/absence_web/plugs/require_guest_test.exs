@@ -2,7 +2,6 @@ defmodule AbsenceWeb.RequireGuestTest do
   use AbsenceWeb.ConnCase, async: true
 
   import Absence.Factory
-  import AbsenceWeb.Router.Helpers, only: [page_path: 2]
 
   alias AbsenceWeb.RequireGuest
 
@@ -37,7 +36,7 @@ defmodule AbsenceWeb.RequireGuestTest do
     test "reidrects to login page", %{conn: conn} do
       conn = RequireGuest.call(conn, [])
 
-      assert redirected_to(conn) == page_path(conn, :index)
+      assert redirected_to_homepage(conn)
     end
 
     test "sets error flash message", %{conn: conn} do
