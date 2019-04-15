@@ -11,6 +11,18 @@ defmodule AbsenceWeb.AuthenticatePlugTest do
 
   setup :verify_on_exit!
 
+  describe "call/2 when current_user is already assigned" do
+    setup %{conn: conn} do
+      conn = assign(conn, :current_user, %User{id: @user_id})
+
+      {:ok, conn: conn}
+    end
+
+    test "returns unmodified conn", %{conn: conn} do
+      assert AuthenticatePlug.call(conn, []) == conn
+    end
+  end
+
   describe "call/2 with valid token" do
     setup %{conn: conn} do
       token = Phoenix.Token.sign(AbsenceWeb.Endpoint, "session", @user_id, max_age: 24 * 60 * 60)
