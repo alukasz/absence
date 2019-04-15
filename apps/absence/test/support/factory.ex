@@ -1,4 +1,7 @@
 defmodule Absence.Factory do
+  use ExMachina.Ecto, repo: Absence.Repo
+
+  alias Absence.Accounts
   alias Absence.Absences.Aggregates.Employee
   alias Absence.Absences.Aggregates.TeamLeader
 
@@ -24,5 +27,15 @@ defmodule Absence.Factory do
 
   def with_team_leader(%{} = event, %TeamLeader{} = team_leader) do
     %{event | team_leader_uuid: team_leader.uuid}
+  end
+
+  def user_factory do
+    %Accounts.User{
+      first_name: "Alice",
+      last_name: "Doe",
+      email: sequence(:user_email, &"test-#{&1}@example.com"),
+      password: "P@ssw0rd",
+      password_confirmation: "P@ssw0rd"
+    }
   end
 end

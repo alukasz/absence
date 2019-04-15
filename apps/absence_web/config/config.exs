@@ -6,6 +6,9 @@ use Mix.Config
 
 # General application configuration
 config :absence_web,
+  accounts: Absence.Accounts
+
+config :absence_web,
   ecto_repos: [EventSourcing.EventStore.Repo],
   generators: [context_app: :absence, binary_id: true]
 

@@ -1,0 +1,32 @@
+<h1>Registration</h1>
+
+<%= form_for @user, Routes.registration_path(@conn, :create), fn f -> %>
+  <div class="form-group">
+    <%= text_input f, :first_name, placeholder: "First name" %>
+    <%= error_tag f, :first_name %>
+  </div>
+
+  <div class="form-group">
+    <%= text_input f, :last_name, placeholder: "Last name" %>
+    <%= error_tag f, :last_name %>
+  </div>
+
+  <div class="form-group">
+    <%= text_input f, :email, placeholder: "Email" %>
+    <%= error_tag f, :email %>
+  </div>
+
+  <div class="form-group">
+    <%= password_input f, :password, placeholder: "Password" %>
+    <%= error_tag f, :password %>
+  </div>
+
+  <div class="form-group">
+    <%= password_input f, :password_confirmation, placeholder: "Repeat password" %>
+    <%= error_tag f, :password_confirmation %>
+  </div>
+
+  <div class="form-group">
+    <%= submit "Register" %>
+  </div>
+<% end %>
