@@ -63,26 +63,23 @@ defmodule Absence.Absences.Aggregates.Employee do
 
   def apply(%Employee{} = employee, %TimeoffRequestApproved{} = event) do
     %TimeoffRequestApproved{timeoff_request: timeoff_request} = event
-    remove_timeoff_request(employee, timeoff_request.uuid)
+    employee = remove_pending_timeoff_request(employee, timeoff_request.uuid)
     update_in(employee.approved_timeoff_requests, &[timeoff_request | &1])
   end
 
   def apply(%Employee{} = employee, %TimeoffRequestRejected{} = event) do
     %TimeoffRequestRejected{timeoff_request: timeoff_request} = event
-    remove_timeoff_request(employee, timeoff_request.uuid)
+    employee = remove_pending_timeoff_request(employee, timeoff_request.uuid)
     update_in(employee.rejected_timeoff_requests, &[timeoff_request | &1])
   end
 
-  defp remove_timeoff_request(employee, uuid) do
+  defp remove_pending_timeoff_request(employee, uuid) do
     timeoff_requests =
       Enum.reject(employee.pending_timeoff_requests, fn
         %{uuid: ^uuid} -> true
         _ -> false
       end)
 
-    %{
-      employee
-      | pending_timeoff_requests: timeoff_requests
-    }
+    %{employee | pending_timeoff_requests: timeoff_requests}
   end
 end

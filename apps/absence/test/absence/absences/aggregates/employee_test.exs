@@ -27,7 +27,7 @@ defmodule Absence.Absences.Aggregates.EmployeeTest do
     end
 
     test "HoursAdded events increases hours of aggregate", %{employee: employee} do
-      event = build_event(:hours_added, employee_uuid: employee.uuid)
+      event = build_event(:hours_added) |> with_employee(employee)
 
       assert Employee.apply(employee, event) == %{employee | hours: employee.hours + event.hours}
     end
@@ -44,7 +44,7 @@ defmodule Absence.Absences.Aggregates.EmployeeTest do
     end
 
     test "HoursRemoved events decreases hours of aggregate", %{employee: employee} do
-      event = build_event(:hours_removed, employee_uuid: employee.uuid)
+      event = build_event(:hours_removed) |> with_employee(employee)
 
       assert Employee.apply(employee, event) == %{employee | hours: employee.hours - event.hours}
     end
@@ -64,7 +64,7 @@ defmodule Absence.Absences.Aggregates.EmployeeTest do
     test "TimeoffRequested event adds TimeoffRequest to pending timeoff requests", %{
       employee: employee
     } do
-      event = build_event(:timeoff_requested, employee_uuid: employee.uuid)
+      event = build_event(:timeoff_requested) |> with_employee(employee)
 
       expected_request = %TimeoffRequest{
         employee_uuid: employee.uuid,
@@ -79,8 +79,8 @@ defmodule Absence.Absences.Aggregates.EmployeeTest do
     test "2 TimeoffRequested events add 2 TimeoffRequest to pending timeoff requests", %{
       employee: employee
     } do
-      event1 = build_event(:timeoff_requested, employee_uuid: employee.uuid)
-      event2 = build_event(:timeoff_requested, employee_uuid: employee.uuid)
+      event1 = build_event(:timeoff_requested) |> with_employee(employee)
+      event2 = build_event(:timeoff_requested) |> with_employee(employee)
 
       expected_requests = [
         %TimeoffRequest{
@@ -106,37 +106,27 @@ defmodule Absence.Absences.Aggregates.EmployeeTest do
       employee: employee,
       team_leader: team_leader
     } do
-      timeoff_requested_event = build_event(:timeoff_requested, employee_uuid: employee.uuid)
-
-      %{pending_timeoff_requests: actual_requests} =
-        Employee.apply(employee, timeoff_requested_event)
+      timeoff_request = build_entity(:timeoff_request) |> with_employee(employee)
+      employee = %{employee | pending_timeoff_requests: [timeoff_request]}
 
       timeoff_request_approved_event =
-        build_event(:timeoff_request_approved,
-          team_leader_uuid: team_leader.uuid,
-          employee_uuid: employee.uuid,
-          timeoff_request: Enum.at(actual_requests, 0)
-        )
+        build_event(:timeoff_request_approved, timeoff_request: timeoff_request)
+        |> with_employee(employee)
+        |> with_team_leader(team_leader)
 
-      assert %{approved_timeoff_requests: [timeoff_request], rejected_timeoff_requests: []} =
+      assert %{approved_timeoff_requests: [^timeoff_request], rejected_timeoff_requests: []} =
                Employee.apply(employee, timeoff_request_approved_event)
     end
 
     test "TimeoffRequestApproved event removes appropriate TimeoffRequest from pending timeoff requests",
          %{employee: employee, team_leader: team_leader} do
-      timeoff_requested_event = build_event(:timeoff_requested, employee_uuid: employee.uuid)
-
-      %{pending_timeoff_requests: actual_requests} =
-        Employee.apply(employee, timeoff_requested_event)
+      timeoff_request = build_entity(:timeoff_request) |> with_employee(employee)
+      employee = %{employee | pending_timeoff_requests: [timeoff_request]}
 
       timeoff_request_approved_event =
-        build_event(:timeoff_request_approved,
-          team_leader_uuid: team_leader.uuid,
-          employee_uuid: employee.uuid,
-          timeoff_request: Enum.at(actual_requests, 0)
-        )
-
-      Employee.apply(employee, timeoff_requested_event)
+        build_event(:timeoff_request_approved, timeoff_request: timeoff_request)
+        |> with_employee(employee)
+        |> with_team_leader(team_leader)
 
       assert %{pending_timeoff_requests: []} =
                Employee.apply(employee, timeoff_request_approved_event)
@@ -148,19 +138,15 @@ defmodule Absence.Absences.Aggregates.EmployeeTest do
       employee: employee,
       team_leader: team_leader
     } do
-      timeoff_requested_event = build_event(:timeoff_requested, employee_uuid: employee.uuid)
-
-      %{pending_timeoff_requests: actual_requests} =
-        Employee.apply(employee, timeoff_requested_event)
+      timeoff_request = build_entity(:timeoff_request) |> with_employee(employee)
+      employee = %{employee | pending_timeoff_requests: [timeoff_request]}
 
       timeoff_request_rejected_event =
-        build_event(:timeoff_request_rejected,
-          team_leader_uuid: team_leader.uuid,
-          employee_uuid: employee.uuid,
-          timeoff_request: Enum.at(actual_requests, 0)
-        )
+        build_event(:timeoff_request_rejected, timeoff_request: timeoff_request)
+        |> with_employee(employee)
+        |> with_team_leader(team_leader)
 
-      assert %{approved_timeoff_requests: [], rejected_timeoff_requests: [timeoff_request]} =
+      assert %{approved_timeoff_requests: [], rejected_timeoff_requests: [^timeoff_request]} =
                Employee.apply(employee, timeoff_request_rejected_event)
     end
 
@@ -169,19 +155,13 @@ defmodule Absence.Absences.Aggregates.EmployeeTest do
            employee: employee,
            team_leader: team_leader
          } do
-      timeoff_requested_event = build_event(:timeoff_requested, employee_uuid: employee.uuid)
-
-      %{pending_timeoff_requests: actual_requests} =
-        Employee.apply(employee, timeoff_requested_event)
+      timeoff_request = build_entity(:timeoff_request) |> with_employee(employee)
+      employee = %{employee | pending_timeoff_requests: [timeoff_request]}
 
       timeoff_request_rejected_event =
-        build_event(:timeoff_request_rejected,
-          team_leader_uuid: team_leader.uuid,
-          employee_uuid: employee.uuid,
-          timeoff_request: Enum.at(actual_requests, 0)
-        )
-
-      Employee.apply(employee, timeoff_requested_event)
+        build_event(:timeoff_request_rejected, timeoff_request: timeoff_request)
+        |> with_employee(employee)
+        |> with_team_leader(team_leader)
 
       assert %{pending_timeoff_requests: []} =
                Employee.apply(employee, timeoff_request_rejected_event)
