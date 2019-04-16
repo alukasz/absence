@@ -28,6 +28,6 @@ defmodule AbsenceWeb.SessionController do
   end
 
   defp put_user_in_session(conn, %User{id: id}) do
-    put_session(conn, :user_id,  Authenticator.encrypt(id))
+    put_session(conn, :user_id, Authenticator.encrypt(id))
   end
 end
