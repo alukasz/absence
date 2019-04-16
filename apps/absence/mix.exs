@@ -29,7 +29,8 @@ defmodule Absence.MixProject do
   defp deps do
     [
       {:ex_machina, "~> 2.2", only: :test},
-      {:event_sourcing, in_umbrella: true}
+      {:event_sourcing, in_umbrella: true},
+      {:argon2_elixir, "~> 2.0"}
     ]
   end
 end

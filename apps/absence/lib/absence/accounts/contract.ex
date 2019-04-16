@@ -6,4 +6,6 @@ defmodule Absence.Accounts.Contract do
   @callback user_changeset(User.t()) :: Changeset.t()
 
   @callback register(map) :: {:ok, User.t()} | {:error, Changeset.t()}
+
+  @callback authenticate_email_password(String.t(), String.t()) :: {:ok, User.t()} | :error
 end
