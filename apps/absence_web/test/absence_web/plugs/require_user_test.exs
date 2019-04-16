@@ -2,7 +2,6 @@ defmodule AbsenceWeb.RequireUserTest do
   use AbsenceWeb.ConnCase, async: true
 
   import Absence.Factory
-  import AbsenceWeb.Router.Helpers, only: [session_path: 2]
 
   alias AbsenceWeb.RequireUser
 

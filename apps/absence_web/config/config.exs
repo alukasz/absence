@@ -10,7 +10,8 @@ config :absence_web,
 
 config :absence_web,
   ecto_repos: [EventSourcing.EventStore.Repo],
-  generators: [context_app: :absence, binary_id: true]
+  generators: [context_app: :absence, binary_id: true],
+  token_ttl: 24 * 60 * 60
 
 # Configures the endpoint
 config :absence_web, AbsenceWeb.Endpoint,
