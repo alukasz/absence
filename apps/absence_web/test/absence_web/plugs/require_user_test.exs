@@ -37,7 +37,7 @@ defmodule AbsenceWeb.RequireUserTest do
     test "reidrects to login page", %{conn: conn} do
       conn = RequireUser.call(conn, [])
 
-      assert redirected_to(conn) == session_path(conn, :new)
+      assert redirected_to_login_page(conn)
     end
 
     test "sets error flash message", %{conn: conn} do
