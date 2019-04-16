@@ -33,7 +33,7 @@ defmodule AbsenceWeb.RequireGuestTest do
       assert %{halted: true} = RequireGuest.call(conn, [])
     end
 
-    test "reidrects to login page", %{conn: conn} do
+    test "redirects to login page", %{conn: conn} do
       conn = RequireGuest.call(conn, [])
 
       assert redirected_to_homepage(conn)

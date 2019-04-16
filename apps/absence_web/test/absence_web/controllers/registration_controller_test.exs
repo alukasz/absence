@@ -43,7 +43,7 @@ defmodule AbsenceWeb.RegistrationControllerTest do
   end
 
   describe "#create with valid params" do
-    test "redirects to homepage with flash", %{conn: conn} do
+    test "redirects to homepage", %{conn: conn} do
       params = Absence.Factory.string_params_for(:user)
       expect(AccountsMock, :register, 1, fn ^params -> {:ok, %User{}} end)
 
