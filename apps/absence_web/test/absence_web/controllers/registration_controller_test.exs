@@ -1,7 +1,7 @@
 defmodule AbsenceWeb.RegistrationControllerTest do
   use AbsenceWeb.ConnCase, async: true
 
-  import Routes, only: [registration_path: 2, page_path: 2]
+  import Routes, only: [registration_path: 2]
   import Mox
 
   alias Absence.AccountsMock
@@ -22,16 +22,42 @@ defmodule AbsenceWeb.RegistrationControllerTest do
       assert html_response(conn, 200) =~ "Repeat password"
       assert html_response(conn, 200) =~ "Register"
     end
+
+    test "redirects to home page when user is authenticated", %{conn: conn} do
+      conn = authenticate(conn)
+
+      conn = get(conn, registration_path(conn, :new))
+
+      assert redirected_to_homepage(conn)
+    end
+  end
+
+  describe "#create" do
+    test "redirects to home page when user is authenticated", %{conn: conn} do
+      conn = authenticate(conn)
+
+      conn = post(conn, registration_path(conn, :create), %{session: %{}})
+
+      assert redirected_to_homepage(conn)
+    end
   end
 
   describe "#create with valid params" do
-    test "creates a new user", %{conn: conn} do
+    test "redirects to homepage", %{conn: conn} do
       params = Absence.Factory.string_params_for(:user)
       expect(AccountsMock, :register, 1, fn ^params -> {:ok, %User{}} end)
 
       conn = post(conn, registration_path(conn, :create), %{user: params})
 
-      assert redirected_to(conn) == page_path(conn, :index)
+      assert redirected_to_homepage(conn)
+    end
+
+    test "shows flash message", %{conn: conn} do
+      params = Absence.Factory.string_params_for(:user)
+      expect(AccountsMock, :register, 1, fn ^params -> {:ok, %User{}} end)
+
+      conn = post(conn, registration_path(conn, :create), %{user: params})
+
       assert get_flash(conn, :info) =~ "Registration successful"
     end
   end

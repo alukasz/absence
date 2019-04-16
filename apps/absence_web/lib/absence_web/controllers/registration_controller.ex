@@ -3,6 +3,7 @@ defmodule AbsenceWeb.RegistrationController do
 
   @accounts Application.get_env(:absence_web, :accounts)
 
+  plug AbsenceWeb.RequireGuest when action in [:new, :create]
   plug :scrub_params, "user" when action == :create
 
   def new(conn, _params) do

@@ -3,6 +3,8 @@ defmodule AbsenceWeb.SessionController do
 
   alias Absence.Accounts.User
 
+  plug AbsenceWeb.RequireGuest when action in [:new, :create]
+
   @accounts Application.get_env(:absence_web, :accounts)
   @token_max_age 60 * 60 * 24
 

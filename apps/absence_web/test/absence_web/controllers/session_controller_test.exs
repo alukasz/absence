@@ -1,7 +1,7 @@
 defmodule AbsenceWeb.SessionControllerTest do
   use AbsenceWeb.ConnCase, async: true
 
-  import Routes, only: [session_path: 2, page_path: 2]
+  import Routes, only: [session_path: 2]
   import Mox
 
   alias Absence.AccountsMock
@@ -23,6 +23,24 @@ defmodule AbsenceWeb.SessionControllerTest do
       assert html_response(conn, 200) =~ "Email"
       assert html_response(conn, 200) =~ "Password"
     end
+
+    test "redirects to home page when user is authenticated", %{conn: conn} do
+      conn = authenticate(conn)
+
+      conn = get(conn, session_path(conn, :new))
+
+      assert redirected_to_homepage(conn)
+    end
+  end
+
+  describe "#create" do
+    test "redirects to home page when user is authenticated", %{conn: conn} do
+      conn = authenticate(conn)
+
+      conn = post(conn, session_path(conn, :create), %{session: %{}})
+
+      assert redirected_to_homepage(conn)
+    end
   end
 
   describe "#create with valid email/password" do
@@ -39,7 +57,7 @@ defmodule AbsenceWeb.SessionControllerTest do
     test "redirects to home page", %{conn: conn} do
       conn = post(conn, session_path(conn, :create), %{session: @params})
 
-      assert redirected_to(conn) =~ page_path(conn, :index)
+      assert redirected_to_homepage(conn)
     end
 
     test "puts token in session", %{conn: conn} do

@@ -83,4 +83,16 @@ defmodule Absence.AccountsTest do
       assert :error = Accounts.authenticate_email_password(user.email, "wrong password")
     end
   end
+
+  describe "get_user/1" do
+    test "returns User when it exists" do
+      user = build(:user) |> with_hashed_password(@password) |> insert()
+
+      assert Accounts.get_user(user.id) == user
+    end
+
+    test "returns nil when User does not exist" do
+      assert Accounts.get_user(42) == nil
+    end
+  end
 end
