@@ -2,11 +2,11 @@ defmodule AbsenceWeb.SessionController do
   use AbsenceWeb, :controller
 
   alias Absence.Accounts.User
+  alias AbsenceWeb.Authenticator
 
   plug AbsenceWeb.RequireGuest when action in [:new, :create]
 
   @accounts Application.get_env(:absence_web, :accounts)
-  @token_max_age 60 * 60 * 24
 
   def new(conn, _params) do
     render(conn, "new.html")
@@ -28,7 +28,6 @@ defmodule AbsenceWeb.SessionController do
   end
 
   defp put_user_in_session(conn, %User{id: id}) do
-    token = Phoenix.Token.sign(conn, "session", id, max_age: @token_max_age)
-    put_session(conn, :user_id, token)
+    put_session(conn, :user_id, Authenticator.encrypt(id))
   end
 end

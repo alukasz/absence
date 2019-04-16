@@ -25,7 +25,7 @@ defmodule AbsenceWeb.AuthenticatePlugTest do
 
   describe "call/2 with valid token" do
     setup %{conn: conn} do
-      token = Phoenix.Token.sign(AbsenceWeb.Endpoint, "session", @user_id, max_age: 24 * 60 * 60)
+      token = AbsenceWeb.Authenticator.encrypt(@user_id)
       conn = Plug.Test.init_test_session(conn, %{user_id: token})
       user = %User{id: @user_id}
 

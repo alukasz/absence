@@ -65,8 +65,7 @@ defmodule AbsenceWeb.SessionControllerTest do
 
       token = get_session(conn, :user_id)
 
-      assert {:ok, @user_id} =
-               Phoenix.Token.verify(AbsenceWeb.Endpoint, "session", token, max_age: 24 * 60 * 60)
+      assert {:ok, @user_id} = AbsenceWeb.Authenticator.decrypt(token)
     end
   end
 
