@@ -30,4 +30,12 @@ defmodule AbsenceWeb.SessionController do
   defp put_user_in_session(conn, %User{id: id}) do
     put_session(conn, :user_id, Authenticator.encrypt(id))
   end
+
+  def delete(conn, _user_id) do
+    delete_session(conn, :user_id)
+
+    conn
+    |> put_flash(:ok, "Logged out successfully")
+    |> redirect(to: "/session/new")
+  end
 end
