@@ -94,4 +94,20 @@ defmodule AbsenceWeb.SessionControllerTest do
       assert html_response(conn, 200) =~ "Invalid email/password"
     end
   end
+
+  describe "#delete" do
+    test "deletes user from session", %{conn: conn} do
+      conn = authenticate(conn)
+      conn = delete(conn, session_path(conn, :delete))
+
+      assert nil == get_session(conn, :user_id)
+    end
+
+    test "redirects to login page", %{conn: conn} do
+      conn = authenticate(conn)
+      conn = delete(conn, session_path(conn, :delete))
+
+      assert redirected_to_login_page(conn)
+    end
+  end
 end
