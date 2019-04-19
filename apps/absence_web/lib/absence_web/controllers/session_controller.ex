@@ -5,6 +5,7 @@ defmodule AbsenceWeb.SessionController do
   alias AbsenceWeb.Authenticator
 
   plug AbsenceWeb.RequireGuest when action in [:new, :create]
+  plug AbsenceWeb.RequireUser when action in [:delete]
 
   @accounts Application.get_env(:absence_web, :accounts)
 
