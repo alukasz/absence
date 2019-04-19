@@ -20,7 +20,8 @@ defmodule AbsenceWeb.Router do
     get "/", PageController, :index
 
     resources "/registration", RegistrationController, only: [:new, :create]
-    resources "/session", SessionController, only: [:new, :create, :delete]
+    resources "/session", SessionController, only: [:new, :create]
+    delete "/session", SessionController, :delete, as: :session
   end
 
   # Other scopes may use custom stacks.

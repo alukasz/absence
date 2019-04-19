@@ -31,7 +31,7 @@ defmodule AbsenceWeb.SessionController do
     put_session(conn, :user_id, Authenticator.encrypt(id))
   end
 
-  def delete(conn, _user_id) do
+  def delete(conn, _) do
     delete_session(conn, :user_id)
 
     conn

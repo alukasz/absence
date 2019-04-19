@@ -1,7 +1,7 @@
 defmodule AbsenceWeb.SessionControllerTest do
   use AbsenceWeb.ConnCase, async: true
 
-  import Routes, only: [session_path: 2, session_path: 3]
+  import Routes, only: [session_path: 2]
   import Mox
 
   alias Absence.AccountsMock
@@ -96,18 +96,16 @@ defmodule AbsenceWeb.SessionControllerTest do
   end
 
   describe "#delete" do
-    setup :verify_on_exit!
-
     test "deletes user from session", %{conn: conn} do
       conn = authenticate(conn)
-      conn = delete(conn, session_path(conn, :delete, @user_id))
+      conn = delete(conn, session_path(conn, :delete))
 
       assert nil == get_session(conn, :user_id)
     end
 
     test "redirects to login page", %{conn: conn} do
       conn = authenticate(conn)
-      conn = delete(conn, session_path(conn, :delete, @user_id))
+      conn = delete(conn, session_path(conn, :delete))
 
       assert redirected_to_login_page(conn)
     end
