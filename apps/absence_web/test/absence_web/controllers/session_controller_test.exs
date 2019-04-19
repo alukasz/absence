@@ -99,12 +99,14 @@ defmodule AbsenceWeb.SessionControllerTest do
     setup :verify_on_exit!
 
     test "deletes user from session", %{conn: conn} do
+      conn = authenticate(conn)
       conn = delete(conn, session_path(conn, :delete, @user_id))
 
       assert nil == get_session(conn, :user_id)
     end
 
     test "redirects to login page", %{conn: conn} do
+      conn = authenticate(conn)
       conn = delete(conn, session_path(conn, :delete, @user_id))
 
       assert redirected_to_login_page(conn)
