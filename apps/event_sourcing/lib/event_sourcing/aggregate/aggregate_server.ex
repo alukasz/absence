@@ -52,10 +52,11 @@ defmodule EventSourcing.Aggregate.AggregateServer do
   end
 
   defp build_aggregate(state) do
-    %{aggregate_mod: aggregate_mod, aggregate_uuid: aggregate_uuid} = state
+    %{store_mod: store_mod, aggregate_mod: aggregate_mod, aggregate_uuid: aggregate_uuid} = state
     aggregate_state = struct(aggregate_mod, uuid: aggregate_uuid)
+    events = store_mod.get(aggregate_uuid)
 
-    %{state | aggregate_state: aggregate_state}
+    apply_events(%{state | aggregate_state: aggregate_state}, events)
   end
 
   defp execute_command(state, command, _context) do
