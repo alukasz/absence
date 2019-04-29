@@ -29,14 +29,20 @@ defmodule EventSourcing.Aggregate.AggregateServerTest do
     @increments 5
 
     test "fetches aggregates events from store and applies them on start", %{state: state} do
-      for _ <- 1..@increments, do: AgentEventStore.put(state.aggregate_uuid, %Incremented{counter_uuid: state.aggregate_uuid})
+      for _ <- 1..@increments,
+          do:
+            AgentEventStore.put(state.aggregate_uuid, %Incremented{
+              counter_uuid: state.aggregate_uuid
+            })
 
-      assert {:noreply, %{aggregate_state: %Counter{value: @increments}}} = AggregateServer.handle_continue(:build_aggregate, state)
+      assert {:noreply, %{aggregate_state: %Counter{value: @increments}}} =
+               AggregateServer.handle_continue(:build_aggregate, state)
     end
   end
 
   defp state(_) do
     uuid = UUID.generate()
+
     state = %AggregateServer{
       aggregate_mod: Counter,
       aggregate_uuid: uuid,
