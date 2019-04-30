@@ -47,6 +47,8 @@ defmodule EventSourcing.AggregateTest do
     end
 
     test "generates UUID for event", %{aggregate: aggregate, command: command, context: context} do
+      start_aggregate(aggregate)
+
       assert {event, _} = Aggregate.execute_command(aggregate, command, context)
 
       refute event.uuid == nil
@@ -74,9 +76,9 @@ defmodule EventSourcing.AggregateTest do
       assert pid1 == pid2
     end
 
-    test "creates process per aggregate", %{command: command, context: context} = test_context do
-      {:ok, aggregate: aggregate1} = aggregate(test_context)
-      {:ok, aggregate: aggregate2} = aggregate(test_context)
+    test "creates process per aggregate", %{command: command, context: context} do
+      aggregate1 = aggregate()
+      aggregate2 = aggregate()
 
       Aggregate.execute_command(aggregate1, command, context)
       pid1 = find_aggregate_pid(aggregate1)
@@ -92,6 +94,8 @@ defmodule EventSourcing.AggregateTest do
       command: command,
       context: context
     } do
+      start_aggregate(aggregate)
+
       {event, _} = Aggregate.execute_command(aggregate, command, context)
 
       assert_receive {:store_put, ^uuid, ^event}
@@ -111,10 +115,16 @@ defmodule EventSourcing.AggregateTest do
   end
 
   defp aggregate(_) do
-    mod = Counter
-    uuid = UUID.generate()
-    aggregate = {mod, uuid}
+    {:ok, aggregate: aggregate()}
+  end
 
+  defp aggregate, do: {Counter, UUID.generate()}
+
+  defp start_aggregate(%{aggregate: aggregate} = _text_context) do
+    start_aggregate(aggregate)
+  end
+
+  defp start_aggregate({mod, uuid} = aggregate) do
     opts = [
       aggregate_mod: mod,
       aggregate_uuid: uuid,
@@ -122,9 +132,9 @@ defmodule EventSourcing.AggregateTest do
       uuid_generator: UUID
     ]
 
-    {:ok, _} = start_supervised({AggregateServer, opts}, id: aggregate)
+    {:ok, pid} = start_supervised({AggregateServer, opts}, id: aggregate)
 
-    {:ok, aggregate: aggregate}
+    {aggregate, pid}
   end
 
   defp command(_) do
