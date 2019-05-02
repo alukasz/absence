@@ -3,6 +3,12 @@ defmodule Absence.Factory.CommandFactory do
 
   alias Absence.Absences.Commands
 
+  def params_for(factory, attrs \\ %{}) do
+    factory
+    |> build(attrs)
+    |> Map.from_struct()
+  end
+
   def add_hours_factory do
     %Commands.AddHours{
       hours: 8

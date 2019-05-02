@@ -13,6 +13,10 @@ defmodule Absence.Factory do
     to: Absence.Factory.CommandFactory,
     as: :build
 
+  defdelegate params_for_command(factory_name, attrs \\ []),
+    to: Absence.Factory.CommandFactory,
+    as: :params_for
+
   defdelegate build_event(factory_name, attrs \\ []),
     to: Absence.Factory.EventFactory,
     as: :build
@@ -21,12 +25,15 @@ defmodule Absence.Factory do
     to: Absence.Factory.EntityFactory,
     as: :build
 
-  def with_employee(%{} = event, %Employee{} = employee) do
-    %{event | employee_uuid: employee.uuid}
+  def with_employee(%{} = factory, %Employee{} = employee \\ build_aggregate(:employee)) do
+    %{factory | employee_uuid: employee.uuid}
   end
 
-  def with_team_leader(%{} = event, %TeamLeader{} = team_leader) do
-    %{event | team_leader_uuid: team_leader.uuid}
+  def with_team_leader(
+        %{} = factory,
+        %TeamLeader{} = team_leader \\ build_aggregate(:team_leader)
+      ) do
+    %{factory | team_leader_uuid: team_leader.uuid}
   end
 
   @password "P@ssw0rd"
