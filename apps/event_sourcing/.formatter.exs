@@ -3,7 +3,10 @@ locals_without_parens = [
   dispatch: 2,
   # EventSourcing.EventHandler
   handle: 2,
-  handle: 3
+  handle: 3,
+  # EventSourcing.Command
+  field: 2,
+  field: 3
 ]
 
 [
