@@ -32,9 +32,9 @@ defmodule EventSourcing.CommandTest do
       assert function_exported?(ExampleCommand, :__schema__, 0)
 
       assert ExampleCommand.__schema__() == {
-        %{bar: nil, baz: nil, foo: nil, uuid: nil},
-        %{bar: :string, baz: :date, foo: :integer}
-      }
+               %{bar: nil, baz: nil, foo: nil, uuid: nil},
+               %{bar: :string, baz: :date, foo: :integer}
+             }
     end
   end
 
