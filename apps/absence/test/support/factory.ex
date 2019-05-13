@@ -13,9 +13,9 @@ defmodule Absence.Factory do
     to: Absence.Factory.CommandFactory,
     as: :build
 
-  defdelegate params_for_command(factory_name, attrs \\ []),
+  defdelegate string_params_for_command(factory_name, attrs \\ []),
     to: Absence.Factory.CommandFactory,
-    as: :params_for
+    as: :string_params_for
 
   defdelegate build_event(factory_name, attrs \\ []),
     to: Absence.Factory.EventFactory,
