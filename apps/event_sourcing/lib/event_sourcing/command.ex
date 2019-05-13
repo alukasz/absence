@@ -64,6 +64,10 @@ defmodule EventSourcing.Command do
         end
       end
 
+      def __schema__ do
+        @schema
+      end
+
       defoverridable validate: 1
     end
   end
