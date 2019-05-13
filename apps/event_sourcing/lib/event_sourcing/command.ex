@@ -4,32 +4,28 @@ defmodule EventSourcing.Command do
       import EventSourcing.Command
       import Ecto.Changeset
 
-      Module.register_attribute(__MODULE__, :fields, accumulate: true)
+      Module.register_attribute(__MODULE__, :command, accumulate: true)
     end
   end
 
   defmacro field(name, type, opts \\ []) do
     quote do
-      Module.put_attribute(__MODULE__, :fields, {unquote(name), unquote(type), unquote(opts)})
+      Module.put_attribute(__MODULE__, :command, {unquote(name), unquote(type), unquote(opts)})
     end
   end
 
   defmacro command(do: block) do
     quote do
-      try do
-        unquote(block)
-      after
-        :ok
-      end
+      unquote(block)
 
-      @names Enum.map(@fields, &elem(&1, 0))
-      @required_names Enum.filter(@fields, fn {_, _, opts} ->
-                        Keyword.get(opts, :required, true)
-                      end)
-                      |> Enum.map(&elem(&1, 0))
-      @types Enum.map(@fields, fn {name, type, _} -> {name, type} end) |> Enum.into(%{})
+      @fields Enum.map(@command, &elem(&1, 0))
+      @required_fields Enum.filter(@command, fn {_, _, opts} ->
+                         Keyword.get(opts, :required, true)
+                       end)
+                       |> Enum.map(&elem(&1, 0))
+      @types Enum.map(@command, fn {name, type, _} -> {name, type} end) |> Enum.into(%{})
       @struct_definition [uuid: nil] ++
-                           Enum.map(@fields, fn {name, _, opts} ->
+                           Enum.map(@command, fn {name, _, opts} ->
                              {name, Keyword.get(opts, :default)}
                            end)
       @empty_data Enum.into(@struct_definition, %{})
@@ -47,7 +43,7 @@ defmodule EventSourcing.Command do
         params
         |> cast()
         |> Ecto.Changeset.put_change(:uuid, @uuid_generator.generate())
-        |> Ecto.Changeset.validate_required(@required_names)
+        |> Ecto.Changeset.validate_required(@required_fields)
         |> validate()
         |> get_command()
       end
@@ -57,7 +53,7 @@ defmodule EventSourcing.Command do
       end
 
       defp cast(params) do
-        changeset = Ecto.Changeset.cast(@schema, params, @names)
+        changeset = Ecto.Changeset.cast(@schema, params, @fields)
         put_in(changeset.changes, Map.merge(@empty_data, changeset.changes))
       end
 

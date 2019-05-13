@@ -59,6 +59,16 @@ defmodule EventSourcing.CommandTest do
       assert {:error, %Ecto.Changeset{action: :insert} = changeset} = FancyCommand.build(%{})
     end
 
+    test "default values" do
+      assert {:error, changeset} = FancyCommand.build(%{})
+      refute Map.has_key?(errors_on(changeset), :default)
+    end
+
+    test "fields are required if not specified" do
+      assert {:error, changeset} = FancyCommand.build(%{default: nil})
+      assert "can't be blank" in errors_on(changeset).default
+    end
+
     test "required fields" do
       assert {:error, changeset} = FancyCommand.build(%{})
       assert "can't be blank" in errors_on(changeset).required
