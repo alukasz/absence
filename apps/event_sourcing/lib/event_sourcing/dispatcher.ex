@@ -7,6 +7,9 @@ defmodule EventSourcing.Dispatcher do
       import EventSourcing.Dispatcher
 
       @before_compile EventSourcing.Dispatcher
+
+      def dispatch({:ok, command}), do: dispatch(command)
+      def dispatch({:error, _} = error), do: error
     end
   end
 

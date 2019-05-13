@@ -26,6 +26,18 @@ defmodule EventSourcing.DispatcherTest do
       assert_receive {:aggregate_called, Counter}
     end
 
+    test "allows to pass {:ok, command} tuple", %{command: command} do
+      DispatcherMock.dispatch({:ok, command})
+
+      assert_receive {:aggregate_called, Counter}
+    end
+
+    test "passing {:error, _} tuple returns it" do
+      error_tuple = {:error, nil}
+
+      assert DispatcherMock.dispatch(error_tuple) == error_tuple
+    end
+
     test "returns error tuple if command is not registered" do
       command = %Decrement{counter_uuid: UUID.generate(), test_pid: self()}
 
