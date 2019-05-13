@@ -36,7 +36,7 @@ defmodule Absence.AbsencesTest do
     test "employee_uuid is required" do
       params = string_params_for_command(:request_timeoff)
 
-      assert {:error, changeset} = Absences.request_timeoff(nil, params)
+      assert {:error, changeset} = Absences.request_timeoff("", params)
 
       assert "can't be blank" in errors_on(changeset).employee_uuid
     end
