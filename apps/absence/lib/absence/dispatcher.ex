@@ -3,6 +3,8 @@ defmodule Absence.Dispatcher do
 
   alias Absence.Absences.Aggregates.Employee
   alias Absence.Absences.Commands.AddHours
+  alias Absence.Absences.Commands.RequestTimeoff
 
   dispatch AddHours, to: Employee, identity: :employee_uuid
+  dispatch RequestTimeoff, to: Employee, identity: :employee_uuid
 end

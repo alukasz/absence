@@ -18,4 +18,8 @@ defmodule EventSourcing.EventStore.AgentEventStore do
     |> Agent.get(fn store -> Map.get(store, uuid, []) end)
     |> Enum.reverse()
   end
+
+  def __reset__ do
+    Agent.update(__MODULE__, fn _ -> %{} end)
+  end
 end

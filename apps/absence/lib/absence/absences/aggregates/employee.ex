@@ -52,13 +52,8 @@ defmodule Absence.Absences.Aggregates.Employee do
   end
 
   def apply(%Employee{} = employee, %TimeoffRequested{} = event) do
-    %{
-      employee
-      | pending_timeoff_requests: [
-          TimeoffRequest.from_event(event)
-          | employee.pending_timeoff_requests
-        ]
-    }
+    timeoff_request = TimeoffRequest.from_event(event)
+    update_in(employee.pending_timeoff_requests, &[timeoff_request | &1])
   end
 
   def apply(%Employee{} = employee, %TimeoffRequestApproved{} = event) do

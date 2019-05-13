@@ -3,6 +3,18 @@ defmodule Absence.Factory.CommandFactory do
 
   alias Absence.Absences.Commands
 
+  def params_for(factory, attrs \\ %{}) do
+    factory
+    |> build(attrs)
+    |> Map.from_struct()
+  end
+
+  def string_params_for(factory, attrs \\ %{}) do
+    factory
+    |> params_for(attrs)
+    |> Map.new(fn {k, v} -> {Atom.to_string(k), v} end)
+  end
+
   def add_hours_factory do
     %Commands.AddHours{
       hours: 8

@@ -10,6 +10,7 @@
       strict: false,
       color: true,
       checks: [
+        {Credo.Check.Design.TagTODO, false},
         {Credo.Check.Readability.ModuleDoc, false},
         {Credo.Check.Refactor.PipeChainStart, false}
       ]
