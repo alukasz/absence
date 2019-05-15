@@ -16,11 +16,18 @@ defmodule Absence.AbsencesTest do
       {:ok, employee_uuid: EventSourcing.UUID.generate()}
     end
 
-    # TODO consider how to assert success
     test "with valid params", %{employee_uuid: employee_uuid} do
       params = string_params_for_command(:request_timeoff)
+      start_date = params["start_date"]
+      end_date = params["end_date"]
 
-      assert Absences.request_timeoff(employee_uuid, params)
+      Absences.request_timeoff(employee_uuid, params)
+
+      assert_dispatched %Absence.Absences.Commands.RequestTimeoff{
+        employee_uuid: ^employee_uuid,
+        start_date: ^start_date,
+        end_date: ^end_date
+      }
     end
 
     for field <- [:start_date, :end_date] do
