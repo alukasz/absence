@@ -14,6 +14,15 @@ defmodule EventSourcing.Application do
       {Registry, keys: :unique, name: EventSourcing.AggregateRegistry}
     ]
 
+    children =
+      case Mix.env() do
+        :test ->
+          [{Registry, keys: :unique, name: EventSourcing.FakeDispatcherRegistry} | children]
+
+        _ ->
+          children
+      end
+
     opts = [strategy: :one_for_one, name: EventSourcing.Supervisor]
     Supervisor.start_link(children, opts)
   end
