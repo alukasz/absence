@@ -9,7 +9,6 @@ locals_without_parens = [
   field: 3,
   # EventSourcing.AggregateCase
   assert_dispatched: 1,
-  assert_dispatched: 2,
   assert_dispatched: 3
 ]
 

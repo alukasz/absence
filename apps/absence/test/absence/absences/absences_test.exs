@@ -4,6 +4,8 @@ defmodule Absence.AbsencesTest do
   import Absence.Factory
 
   alias Absence.Absences
+  alias Absence.Absences.Commands
+  alias Absence.Absences.Aggregates.Employee
 
   describe "request_timeoff/0" do
     test "returns chagenset" do
@@ -16,18 +18,28 @@ defmodule Absence.AbsencesTest do
       {:ok, employee_uuid: EventSourcing.UUID.generate()}
     end
 
-    test "with valid params", %{employee_uuid: employee_uuid} do
+    test "with valid params builds and dispatches command", %{employee_uuid: employee_uuid} do
       params = string_params_for_command(:request_timeoff)
       start_date = params["start_date"]
       end_date = params["end_date"]
 
       Absences.request_timeoff(employee_uuid, params)
 
-      assert_dispatched %Absence.Absences.Commands.RequestTimeoff{
+      assert_dispatched %Commands.RequestTimeoff{
         employee_uuid: ^employee_uuid,
         start_date: ^start_date,
         end_date: ^end_date
       }
+    end
+
+    test "with valid params dispatches command Employee aggregate", %{
+      employee_uuid: employee_uuid
+    } do
+      params = string_params_for_command(:request_timeoff)
+
+      Absences.request_timeoff(employee_uuid, params)
+
+      assert_dispatched Employee, ^employee_uuid, _
     end
 
     for field <- [:start_date, :end_date] do

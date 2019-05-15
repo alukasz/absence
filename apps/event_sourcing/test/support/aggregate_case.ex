@@ -15,28 +15,43 @@ defmodule EventSourcing.AggregateCase do
     :ok
   end
 
-  defmacro assert_dispatched(pattern) do
-    formatted_pattern = Macro.to_string(pattern)
+  defmacro assert_dispatched(command) do
+    pins = collect_pins_from_pattern(command, Macro.Env.vars(__CALLER__))
+    dispatched = quote do: EventSourcing.FakeDispatcher.commands_dispatched()
+
+    do_assert_dispatched(command, pins, dispatched)
+  end
+
+  defmacro assert_dispatched(aggregate_mod, aggregate_uuid, command) do
+    pattern = {:{}, [], [aggregate_mod, aggregate_uuid, command]}
     pins = collect_pins_from_pattern(pattern, Macro.Env.vars(__CALLER__))
+    dispatched = quote do: EventSourcing.FakeDispatcher.dispatched()
+
+    do_assert_dispatched(pattern, pins, dispatched)
+  end
+
+  def do_assert_dispatched(pattern, pins, dispatched) do
+    formatted_pattern = Macro.to_string(pattern)
 
     quote do
-      dispatched_commands = EventSourcing.FakeDispatcher.commands_dispatched()
+      dispatched = unquote(dispatched)
 
       message =
         "No command matching " <>
           unquote(formatted_pattern) <>
           EventSourcing.AggregateCase.__pins__(unquote(pins)) <>
           "\nDispatched commands: " <>
-          inspect(dispatched_commands, pretty: true)
+          inspect(dispatched, pretty: true)
 
-      assert Enum.any?(dispatched_commands, fn dispatched_command ->
-               match?(unquote(pattern), dispatched_command)
+      assert Enum.any?(dispatched, fn dispatched ->
+               match?(unquote(pattern), dispatched)
              end),
              message
     end
   end
 
-  # from ExUnit
+  # from ExUnit.Assertions
+
   defp collect_pins_from_pattern(expr, vars) do
     {_, pins} =
       Macro.prewalk(expr, [], fn

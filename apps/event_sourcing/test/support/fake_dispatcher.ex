@@ -11,7 +11,7 @@ defmodule EventSourcing.FakeDispatcher do
 
   def commands_dispatched do
     Agent.get(name(), fn dispatched ->
-      Enum.map(dispatched, &elem(&1, 1))
+      Enum.map(dispatched, &elem(&1, 2))
     end)
   end
 
@@ -26,7 +26,7 @@ defmodule EventSourcing.FakeDispatcher do
     quote do
       def dispatch(%unquote(command_mod){unquote(identity) => aggregate_uuid} = command) do
         Agent.update(EventSourcing.FakeDispatcher.name(), fn dispatched ->
-          [{{unquote(aggregate_mod), aggregate_uuid}, command} | dispatched]
+          [{unquote(aggregate_mod), aggregate_uuid, command} | dispatched]
         end)
       end
     end
