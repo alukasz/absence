@@ -27,6 +27,15 @@ defmodule EventSourcing.CommandTest do
     test "generates build/1 function" do
       assert function_exported?(ExampleCommand, :build, 1)
     end
+
+    test "generates __schema__/0 function that defines schema for changeset" do
+      assert function_exported?(ExampleCommand, :__schema__, 0)
+
+      assert ExampleCommand.__schema__() == {
+               %{bar: nil, baz: nil, foo: nil, uuid: nil},
+               %{bar: :string, baz: :date, foo: :integer}
+             }
+    end
   end
 
   describe "changeset/0" do
