@@ -2,10 +2,13 @@ defmodule EventSourcing.Dispatcher do
   alias EventSourcing.Context
   alias EventSourcing.Aggregate
 
-  defmacro __using__(_opts) do
-    quote do
-      import EventSourcing.Dispatcher
+  @default_dispatcher Application.get_env(:event_sourcing, :dispatcher)
 
+  defmacro __using__(opts) do
+    dispatcher_mod = Keyword.get(opts, :dispatcher, @default_dispatcher)
+
+    quote do
+      import unquote(dispatcher_mod), only: [dispatch: 2]
       @before_compile EventSourcing.Dispatcher
 
       def dispatch({:ok, command}), do: dispatch(command)
@@ -16,14 +19,6 @@ defmodule EventSourcing.Dispatcher do
   defmacro __before_compile__(_env) do
     quote do
       def dispatch(command) do
-        unregistered_command(command)
-      end
-
-      def dispatch(command, _) do
-        unregistered_command(command)
-      end
-
-      defp unregistered_command(_command) do
         {:error, :unregistered_command}
       end
     end

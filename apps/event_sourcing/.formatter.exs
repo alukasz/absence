@@ -6,7 +6,10 @@ locals_without_parens = [
   handle: 3,
   # EventSourcing.Command
   field: 2,
-  field: 3
+  field: 3,
+  # EventSourcing.AggregateCase
+  assert_dispatched: 1,
+  assert_dispatched: 3
 ]
 
 [
