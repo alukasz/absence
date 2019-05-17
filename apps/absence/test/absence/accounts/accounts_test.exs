@@ -34,6 +34,14 @@ defmodule Absence.AccountsTest do
 
       assert Argon2.check_pass(user.password, params.password)
     end
+
+    test "populates employee_uuid" do
+      params = params_for(:user)
+
+      assert {:ok, %User{employee_uuid: employee_uuid}} = Accounts.register(params)
+
+      assert is_binary(employee_uuid)
+    end
   end
 
   describe "register/1 with invalid params" do

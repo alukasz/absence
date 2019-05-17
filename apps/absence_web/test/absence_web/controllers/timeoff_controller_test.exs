@@ -33,8 +33,9 @@ defmodule AbsenceWeb.TimeoffControllerTest do
 
   describe "#create" do
     test "with valid params redirects to #index page", %{conn: conn} do
-      expect(AbsencesMock, :request_timeoff, 1, fn _, @valid_params -> :ok end)
       conn = authenticate(conn)
+      user = current_user(conn)
+      expect(AbsencesMock, :request_timeoff, 1, fn ^user, @valid_params -> :ok end)
 
       conn = post(conn, timeoff_path(conn, :create), %{timeoff_request: @valid_params})
 

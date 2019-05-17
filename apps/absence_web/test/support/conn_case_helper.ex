@@ -10,6 +10,10 @@ defmodule AbsenceWeb.ConnCaseHelper do
     Conn.assign(conn, :current_user, user)
   end
 
+  def current_user(conn) do
+    conn.assigns.current_user
+  end
+
   def redirected_to_homepage(conn) do
     assert redirected_to(conn) =~ Helpers.page_path(conn, :index)
   end
