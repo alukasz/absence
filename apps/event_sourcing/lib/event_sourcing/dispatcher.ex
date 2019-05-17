@@ -2,37 +2,23 @@ defmodule EventSourcing.Dispatcher do
   alias EventSourcing.Context
   alias EventSourcing.Aggregate
 
+  @default_dispatcher Application.get_env(:event_sourcing, :dispatcher)
+
   defmacro __using__(opts) do
-    # by default in test env use FakeDistpacher
-    if Mix.env() == :test && Keyword.get(opts, :fake, true) do
-      quote do
-        import EventSourcing.FakeDispatcher, only: [dispatch: 2]
+    dispatcher_mod = Keyword.get(opts, :dispatcher, @default_dispatcher)
 
-        def dispatch({:ok, command}), do: dispatch(command)
-        def dispatch({:error, _} = error), do: error
-      end
-    else
-      quote do
-        import EventSourcing.Dispatcher
-        @before_compile EventSourcing.Dispatcher
+    quote do
+      import unquote(dispatcher_mod), only: [dispatch: 2]
+      @before_compile EventSourcing.Dispatcher
 
-        def dispatch({:ok, command}), do: dispatch(command)
-        def dispatch({:error, _} = error), do: error
-      end
+      def dispatch({:ok, command}), do: dispatch(command)
+      def dispatch({:error, _} = error), do: error
     end
   end
 
   defmacro __before_compile__(_env) do
     quote do
       def dispatch(command) do
-        unregistered_command(command)
-      end
-
-      def dispatch(command, _) do
-        unregistered_command(command)
-      end
-
-      defp unregistered_command(_command) do
         {:error, :unregistered_command}
       end
     end

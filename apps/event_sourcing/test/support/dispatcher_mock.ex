@@ -1,5 +1,5 @@
 defmodule EventSourcing.DispatcherMock do
-  use EventSourcing.Dispatcher, fake: false
+  use EventSourcing.Dispatcher, dispatcher: EventSourcing.Dispatcher
 
   alias EventSourcing.Counters.Aggregates.Counter
   alias EventSourcing.Counters.Commands.Increment
