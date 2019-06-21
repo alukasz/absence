@@ -34,7 +34,7 @@ defmodule Absence.Absences.Aggregates.TeamLeaderTest do
       assert TeamLeader.execute(team_leader, command) == %TimeoffRequestApproved{
                employee_uuid: employee.uuid,
                team_leader_uuid: team_leader.uuid,
-               timeoff_request: timeoff_request
+               timeoff_request: %{timeoff_request | status: :approved}
              }
     end
 
@@ -67,7 +67,7 @@ defmodule Absence.Absences.Aggregates.TeamLeaderTest do
       assert TeamLeader.execute(team_leader, command) == %TimeoffRequestRejected{
                employee_uuid: employee.uuid,
                team_leader_uuid: team_leader.uuid,
-               timeoff_request: timeoff_request
+               timeoff_request: %{timeoff_request | status: :rejected}
              }
     end
 

@@ -18,7 +18,7 @@ defmodule AbsenceWeb.SessionController do
         conn
         |> put_user_in_session(user)
         |> put_flash(:info, "Authenticated successfully")
-        |> redirect(to: Routes.page_path(conn, :index))
+        |> redirect(to: Routes.timeoff_path(conn, :index))
 
       :error ->
         conn

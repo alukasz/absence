@@ -1,1 +1,17 @@
-<h1>TODO</h1>
+<h1>My timeoff requests</h1>
+
+<table class="table">
+  <tr>
+    <th>Stard date</th>
+    <th>End date</th>
+    <th>Status</th>
+  </tr>
+
+  <%= for request <- @timeoff_requests do %>
+    <tr>
+      <td><%= Date.to_string(request.start_date) %></td>
+      <td><%= Date.to_string(request.end_date) %></td>
+      <td><%= request.status %></td>
+    </tr>
+  <% end %>
+</table>

@@ -51,6 +51,10 @@ defmodule EventSourcing.Aggregate.AggregateServer do
     {:reply, result, state}
   end
 
+  def handle_call(:get, _from, state) do
+    {:reply, state.aggregate_state, state}
+  end
+
   defp build_aggregate(state) do
     %{store_mod: store_mod, aggregate_mod: aggregate_mod, aggregate_uuid: aggregate_uuid} = state
     aggregate_state = struct(aggregate_mod, uuid: aggregate_uuid)

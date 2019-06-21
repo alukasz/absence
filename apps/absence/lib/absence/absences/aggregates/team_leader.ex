@@ -18,15 +18,15 @@ defmodule Absence.Absences.Aggregates.TeamLeader do
     %TimeoffRequestApproved{
       employee_uuid: approve_timeoff_request.employee_uuid,
       team_leader_uuid: team_leader.uuid,
-      timeoff_request: approve_timeoff_request.timeoff_request
+      timeoff_request: %{approve_timeoff_request.timeoff_request | status: :approved}
     }
   end
 
-  def execute(%TeamLeader{} = team_leader, %RejectTimeoffRequest{} = approve_timeoff_request) do
+  def execute(%TeamLeader{} = team_leader, %RejectTimeoffRequest{} = reject_timeoff_request) do
     %TimeoffRequestRejected{
-      employee_uuid: approve_timeoff_request.employee_uuid,
+      employee_uuid: reject_timeoff_request.employee_uuid,
       team_leader_uuid: team_leader.uuid,
-      timeoff_request: approve_timeoff_request.timeoff_request
+      timeoff_request: %{reject_timeoff_request.timeoff_request | status: :rejected}
     }
   end
 

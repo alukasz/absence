@@ -15,7 +15,7 @@ defmodule AbsenceWeb.RegistrationController do
       {:ok, _user} ->
         conn
         |> put_flash(:info, "Registration successful")
-        |> redirect(to: Routes.page_path(conn, :index))
+        |> redirect(to: Routes.timeoff_path(conn, :index))
 
       {:error, changeset} ->
         conn

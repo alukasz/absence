@@ -17,13 +17,12 @@ defmodule AbsenceWeb.Router do
   scope "/", AbsenceWeb do
     pipe_through :browser
 
-    get "/", PageController, :index
-
     resources "/registration", RegistrationController, only: [:new, :create]
     resources "/session", SessionController, only: [:new, :create]
     delete "/session", SessionController, :delete, as: :session
 
-    resources "/timeoff", TimeoffController, only: [:index, :new, :create]
+    get "/", TimeoffController, :index
+    resources "/timeoff", TimeoffController, only: [:new, :create]
   end
 
   # Other scopes may use custom stacks.

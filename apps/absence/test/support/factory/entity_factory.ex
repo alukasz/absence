@@ -9,7 +9,8 @@ defmodule Absence.Factory.EntityFactory do
     %TimeoffRequest{
       uuid: @uuid_generator.generate(),
       start_date: ~D[2019-01-01],
-      end_date: ~D[2019-01-10]
+      end_date: ~D[2019-01-10],
+      status: :pending
     }
   end
 end
