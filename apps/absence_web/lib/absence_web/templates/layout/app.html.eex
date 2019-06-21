@@ -12,10 +12,15 @@
       <section class="container">
         <nav role="navigation">
           <ul>
-            <li><a href="https://hexdocs.pm/phoenix/overview.html">Get Started</a></li>
+            <%= if @current_user do %>
+              Hello <%= @current_user.first_name %>
+              <li><%= link "New timeoff request", to: Routes.timeoff_path(@conn, :new)  %></li>
+            <% else %>
+            <li><%= link "Login", to: Routes.session_path(@conn, :new)  %></li>
+            <% end %>
           </ul>
         </nav>
-        <a href="http://phoenixframework.org/" class="phx-logo">
+        <a href="/" class="phx-logo">
           <img src="<%= Routes.static_path(@conn, "/images/phoenix.png") %>" alt="Phoenix Framework Logo"/>
         </a>
       </section>
