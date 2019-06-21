@@ -10,7 +10,7 @@ defmodule Absence.Absences.Aggregates.TeamLeaderTest do
   setup do
     team_leader = build_aggregate(:team_leader)
     employee = build_aggregate(:employee)
-    timeoff_request = build_entity(:timeoff_request) |> with_employee(employee)
+    timeoff_request = build_entity(:timeoff_request, status: :pending) |> with_employee(employee)
 
     employee = %{
       employee
@@ -34,7 +34,7 @@ defmodule Absence.Absences.Aggregates.TeamLeaderTest do
       assert TeamLeader.execute(team_leader, command) == %TimeoffRequestApproved{
                employee_uuid: employee.uuid,
                team_leader_uuid: team_leader.uuid,
-               timeoff_request: timeoff_request
+               timeoff_request: %{timeoff_request | status: :approved}
              }
     end
 
@@ -67,7 +67,7 @@ defmodule Absence.Absences.Aggregates.TeamLeaderTest do
       assert TeamLeader.execute(team_leader, command) == %TimeoffRequestRejected{
                employee_uuid: employee.uuid,
                team_leader_uuid: team_leader.uuid,
-               timeoff_request: timeoff_request
+               timeoff_request: %{timeoff_request | status: :rejected}
              }
     end
 
