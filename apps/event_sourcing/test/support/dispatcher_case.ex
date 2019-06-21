@@ -1,10 +1,10 @@
-defmodule EventSourcing.AggregateCase do
+defmodule EventSourcing.DispatcherCase do
   use ExUnit.CaseTemplate
 
   using do
     quote do
       import EventSourcing.DataCase, only: [errors_on: 1]
-      import EventSourcing.AggregateCase
+      import EventSourcing.DispatcherCase
     end
   end
 
@@ -39,7 +39,7 @@ defmodule EventSourcing.AggregateCase do
       message =
         "No command matching " <>
           unquote(formatted_pattern) <>
-          EventSourcing.AggregateCase.__pins__(unquote(pins)) <>
+          EventSourcing.DispatcherCase.__pins__(unquote(pins)) <>
           "\nDispatched commands: " <>
           inspect(dispatched, pretty: true)
 
