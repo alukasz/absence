@@ -51,31 +51,40 @@ defmodule Absence.Absences.Aggregates.EmployeeTest do
   end
 
   describe "requesting timeoff" do
-    test "RequestTimeoff command generates TimeoffRequestedEvent", %{employee: employee} do
-      command = build_command(:request_timeoff)
+    test "RequestTimeoff command generates TimeoffRequestedEvent", %{
+      employee: employee,
+      timeoff_request: timeoff_request
+    } do
+      command = build_command(:request_timeoff, employee_uuid: employee.uuid)
 
       assert Employee.execute(employee, command) == %TimeoffRequested{
                employee_uuid: employee.uuid,
-               start_date: command.start_date,
-               end_date: command.end_date
+               timeoff_request: timeoff_request
              }
     end
 
     test "TimeoffRequested event adds TimeoffRequest to pending timeoff requests", %{
       employee: employee,
-      timeoff_request: expected_request
+      timeoff_request: timeoff_request
     } do
-      event = build_event(:timeoff_requested) |> with_employee(employee)
+      event =
+        build_event(:timeoff_requested, timeoff_request: timeoff_request)
+        |> with_employee(employee)
 
-      assert %{pending_timeoff_requests: [^expected_request]} = Employee.apply(employee, event)
+      assert %{pending_timeoff_requests: [^timeoff_request]} = Employee.apply(employee, event)
     end
 
     test "2 TimeoffRequested events add 2 TimeoffRequest to pending timeoff requests", %{
       employee: employee,
       timeoff_request: timeoff_request
     } do
-      event1 = build_event(:timeoff_requested) |> with_employee(employee)
-      event2 = build_event(:timeoff_requested) |> with_employee(employee)
+      event1 =
+        build_event(:timeoff_requested, timeoff_request: timeoff_request)
+        |> with_employee(employee)
+
+      event2 =
+        build_event(:timeoff_requested, timeoff_request: timeoff_request)
+        |> with_employee(employee)
 
       expected_requests = [timeoff_request, timeoff_request]
 
