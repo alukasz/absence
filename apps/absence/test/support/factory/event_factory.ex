@@ -19,6 +19,10 @@ defmodule Absence.Factory.EventFactory do
     %Events.TimeoffRequested{}
   end
 
+  def timeoff_review_requested_factory do
+    %Events.TimeoffReviewRequested{}
+  end
+
   def timeoff_request_approved_factory do
     %Events.TimeoffRequestApproved{}
   end
