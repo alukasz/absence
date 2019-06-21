@@ -12,6 +12,8 @@ defmodule Absence.Absences.Aggregates.Employee do
   alias Absence.Absences.Events.TimeoffRequestRejected
   alias Absence.Absences.TimeoffRequest
 
+  @type t :: struct()
+
   defstruct [
     :uuid,
     team_leader_uuid: nil,

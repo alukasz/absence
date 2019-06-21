@@ -10,7 +10,7 @@ defmodule Absence.Absences.Aggregates.TeamLeaderTest do
   setup do
     team_leader = build_aggregate(:team_leader)
     employee = build_aggregate(:employee)
-    timeoff_request = build_entity(:timeoff_request, status: :pending) |> with_employee(employee)
+    timeoff_request = build_entity(:timeoff_request) |> with_employee(employee)
 
     employee = %{
       employee

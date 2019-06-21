@@ -11,6 +11,29 @@ defmodule AbsenceWeb.TimeoffControllerTest do
 
   @valid_params %{"end_date" => "2019-05-13", "start_date" => "2019-05-17"}
 
+  describe "#index" do
+    test "renders employee's timeoff requests", %{conn: conn} do
+      timeoff_request = Absence.Factory.build_entity(:timeoff_request)
+
+      expect(AbsencesMock, :get_timeoff_requests, 1, fn _ ->
+        [timeoff_request]
+      end)
+
+      conn = authenticate(conn)
+
+      conn = get(conn, timeoff_path(conn, :index))
+
+      assert html_response(conn, 200) =~ "My timeoff requests"
+      assert html_response(conn, 200) =~ "pending"
+    end
+
+    test "redirects to login page when user is not authenticated", %{conn: conn} do
+      conn = get(conn, timeoff_path(conn, :index))
+
+      assert redirected_to_login_page(conn)
+    end
+  end
+
   describe "#new" do
     test "renders registration form", %{conn: conn} do
       expect(AbsencesMock, :request_timeoff, 1, fn -> changeset() end)

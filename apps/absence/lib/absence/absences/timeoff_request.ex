@@ -3,6 +3,8 @@ defmodule Absence.Absences.TimeoffRequest do
 
   @uuid_generator Application.get_env(:event_sourcing, :uuid_generator)
 
+  @type t :: struct()
+
   defstruct [
     :uuid,
     :employee_uuid,
