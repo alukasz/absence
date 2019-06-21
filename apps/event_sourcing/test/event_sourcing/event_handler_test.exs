@@ -52,6 +52,27 @@ defmodule EventSourcing.EventHandlerTest do
     end
   end
 
+  describe "matching_handlers/1" do
+    setup %{event: %event_mod{}, handler: handler} do
+      EventHandler.register_handler(event_mod, handler)
+    end
+
+    test "returns list of event handlers that responds to event", %{
+      event: event,
+      handler: handler
+    } do
+      assert handler in EventHandler.matching_handlers(event)
+    end
+
+    defmodule UnregisteredEvent do
+      defstruct [:id]
+    end
+
+    test "returns empty list if no handler is registered for event" do
+      assert EventHandler.matching_handlers(%UnregisteredEvent{}) == []
+    end
+  end
+
   defp registered_handler?(event, handler) do
     %{handlers: handlers} = :sys.get_state(EventHandler)
 

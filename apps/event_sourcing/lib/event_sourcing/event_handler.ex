@@ -36,6 +36,14 @@ defmodule EventSourcing.EventHandler do
     GenServer.cast(__MODULE__, {:dispatch, event, aggregate})
   end
 
+  def __fake_dispatch__(event, aggregate) do
+    GenServer.call(__MODULE__, {:fake_dispatch, event, aggregate})
+  end
+
+  def matching_handlers(event) do
+    GenServer.call(__MODULE__, {:matching_handlers, event})
+  end
+
   def init(_opts) do
     state = %{
       handlers: %{}
@@ -48,10 +56,22 @@ defmodule EventSourcing.EventHandler do
     state =
       update_in(state.handlers[event], fn
         nil -> [handler]
-        handlers -> [handler | handlers]
+        handlers -> Enum.uniq([handler | handlers])
       end)
 
     {:reply, :ok, state}
+  end
+
+  def handle_call({:fake_dispatch, %mod{} = _, _}, {pid, _}, %{handlers: handlers} = state) do
+    handlers
+    |> Map.get(mod, [])
+    |> Enum.each(&send(pid, {:event_handler_called, &1}))
+
+    {:reply, :ok, state}
+  end
+
+  def handle_call({:matching_handlers, %mod{} = _event}, _from, %{handlers: handlers} = state) do
+    {:reply, Map.get(handlers, mod, []), state}
   end
 
   def handle_cast({:dispatch, %mod{} = event, aggregate}, %{handlers: handlers} = state) do
