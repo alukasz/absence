@@ -23,6 +23,11 @@ defmodule EventSourcing.Aggregate do
     GenServer.call(pid, {:execute, command, context})
   end
 
+  def get({_mod, _uuid} = aggregate) do
+    {:ok, pid} = get_aggregate(aggregate)
+    GenServer.call(pid, :get)
+  end
+
   defp get_aggregate({_mod, _uuid} = aggregate) do
     case Registry.lookup(@registry, aggregate) do
       [{pid, _}] -> {:ok, pid}

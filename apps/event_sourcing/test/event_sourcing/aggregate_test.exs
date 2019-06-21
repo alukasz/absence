@@ -114,6 +114,14 @@ defmodule EventSourcing.AggregateTest do
     end
   end
 
+  describe "get/1" do
+    setup :aggregate
+
+    test "returns aggregate state with", %{aggregate: aggregate} do
+      assert %Counter{value: 0} = Aggregate.get(aggregate)
+    end
+  end
+
   defp aggregate(_) do
     {:ok, aggregate: aggregate()}
   end
