@@ -9,7 +9,7 @@ defmodule AbsenceWeb.RequireGuest do
   def call(conn = %{assigns: %{current_user: user}}, _opts) when not is_nil(user) do
     conn
     |> put_flash(:info, "You are already authenticated")
-    |> redirect(to: Helpers.page_path(conn, :index))
+    |> redirect(to: Helpers.timeoff_path(conn, :index))
     |> halt()
   end
 

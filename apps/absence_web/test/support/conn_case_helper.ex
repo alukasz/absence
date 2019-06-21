@@ -15,7 +15,7 @@ defmodule AbsenceWeb.ConnCaseHelper do
   end
 
   def redirected_to_homepage(conn) do
-    assert redirected_to(conn) =~ Helpers.page_path(conn, :index)
+    assert redirected_to(conn) =~ Helpers.timeoff_path(conn, :index)
   end
 
   def redirected_to_login_page(conn) do
