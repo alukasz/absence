@@ -5,6 +5,7 @@ defmodule EventSourcing.EventStore.EctoEventStore do
 
   import Ecto.Query
 
+  alias EventSourcing.EventStore.Encoder
   alias EventSourcing.EventStore.Repo
   alias EventSourcing.EventStore.StoredEvent
 
@@ -26,7 +27,7 @@ defmodule EventSourcing.EventStore.EctoEventStore do
       event_id: event_id,
       stream_id: stream_id,
       event_name: Atom.to_string(event_name),
-      event_data: event
+      event_data: Encoder.encode(event)
     }
 
     %StoredEvent{}
@@ -46,18 +47,7 @@ defmodule EventSourcing.EventStore.EctoEventStore do
     Agent.get_and_update(__MODULE__, fn event_number -> {event_number + 1, event_number + 1} end)
   end
 
-  def decode_events([]), do: []
-
   def decode_events(stored_events) do
-    Enum.map(stored_events, fn %{event_name: event_name, event_data: event_data} ->
-      event_mod = String.to_existing_atom(event_name)
-
-      event_data =
-        Enum.map(event_data, fn {key, value} ->
-          {String.to_existing_atom(key), value}
-        end)
-
-      struct(event_mod, event_data)
-    end)
+    Enum.map(stored_events, &Encoder.decode(&1.event_data))
   end
 end
