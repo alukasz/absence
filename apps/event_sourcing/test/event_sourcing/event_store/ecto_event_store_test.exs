@@ -4,6 +4,7 @@ defmodule EventSourcing.EventStore.EctoEventStoreTest do
   import EventSourcing.Factory
 
   alias EventSourcing.EventStore.EctoEventStore
+  alias EventSourcing.EventStore.Encoder
   alias EventSourcing.Counters.Events.Incremented
 
   setup do
@@ -30,7 +31,8 @@ defmodule EventSourcing.EventStore.EctoEventStoreTest do
     test "returns events in proper order", %{stream_id: stream_id} do
       events =
         for _ <- 1..5 do
-          insert(:stored_event, stream_id: stream_id)
+          event = insert(:stored_event, stream_id: stream_id)
+          Map.put(event, :event_data, Encoder.decode(event.event_data))
         end
 
       assert EctoEventStore.get(stream_id) == Enum.map(events, &Map.get(&1, :event_data))

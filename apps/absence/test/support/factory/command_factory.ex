@@ -34,6 +34,10 @@ defmodule Absence.Factory.CommandFactory do
     }
   end
 
+  def review_timeoff_request_factory do
+    %Commands.ReviewTimeoffRequest{}
+  end
+
   def approve_timeoff_request_factory do
     %Commands.ApproveTimeoffRequest{}
   end

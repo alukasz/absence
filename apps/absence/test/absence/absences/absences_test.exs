@@ -1,5 +1,5 @@
 defmodule Absence.AbsencesTest do
-  use EventSourcing.AggregateCase, async: true
+  use EventSourcing.DispatcherCase, async: true
 
   import Absence.Factory
 

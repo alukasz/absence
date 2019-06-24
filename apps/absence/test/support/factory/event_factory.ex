@@ -16,10 +16,11 @@ defmodule Absence.Factory.EventFactory do
   end
 
   def timeoff_requested_factory do
-    %Events.TimeoffRequested{
-      start_date: ~D[2019-01-01],
-      end_date: ~D[2019-01-10]
-    }
+    %Events.TimeoffRequested{}
+  end
+
+  def timeoff_review_requested_factory do
+    %Events.TimeoffReviewRequested{}
   end
 
   def timeoff_request_approved_factory do
