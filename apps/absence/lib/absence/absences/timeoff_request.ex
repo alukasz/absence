@@ -6,6 +6,8 @@ defmodule Absence.Absences.TimeoffRequest do
 
   @type t :: struct()
 
+  @derive Jason.Encoder
+
   defstruct [
     :uuid,
     :employee_uuid,
