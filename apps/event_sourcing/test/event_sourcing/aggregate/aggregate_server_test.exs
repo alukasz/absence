@@ -28,15 +28,34 @@ defmodule EventSourcing.Aggregate.AggregateServerTest do
     setup :state
     @increments 5
 
-    test "fetches aggregates events from store and applies them on start", %{state: state} do
-      for _ <- 1..@increments,
-          do:
-            AgentEventStore.put(state.aggregate_uuid, %Incremented{
-              counter_uuid: state.aggregate_uuid
-            })
+    test "if aggregate state doesn't already exists fetches events from store and applies them",
+         %{state: state} do
+      uuid = state.aggregate_uuid
 
-      assert {:noreply, %{aggregate_state: %Counter{value: @increments}}} =
+      for _ <- 1..@increments do
+        AgentEventStore.put(uuid, %Incremented{counter_uuid: uuid})
+      end
+
+      assert {:noreply, %{aggregate_state: state}} =
                AggregateServer.handle_continue(:build_aggregate, state)
+
+      assert %Counter{uuid: ^uuid, value: @increments} = state
+    end
+
+    test "uses already existing aggregate state", %{state: state} do
+      uuid = state.aggregate_uuid
+
+      for _ <- 1..@increments do
+        AgentEventStore.put(uuid, %Incremented{counter_uuid: uuid})
+      end
+
+      state = %{state | aggregate_state: %Counter{uuid: :uuid, value: 42}}
+
+      assert {:noreply, %{aggregate_state: state}} =
+               AggregateServer.handle_continue(:build_aggregate, state)
+
+      assert %Counter{uuid: :uuid, value: 42} = state
+      refute state.uuid == uuid
     end
   end
 
@@ -48,7 +67,7 @@ defmodule EventSourcing.Aggregate.AggregateServerTest do
       aggregate_uuid: uuid,
       store_mod: AgentEventStore,
       uuid_generator_mod: UUID,
-      aggregate_state: %Counter{uuid: uuid}
+      aggregate_state: nil
     }
 
     {:ok, state: state}

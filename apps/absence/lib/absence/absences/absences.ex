@@ -2,9 +2,9 @@ defmodule Absence.Absences do
   @behaviour Absence.Absences.Contract
 
   alias Absence.Dispatcher
+  alias Absence.Absences.Aggregates.Employee
   alias Absence.Absences.Commands
   alias Absence.Absences.Contract
-  alias Absence.Absences.Aggregates.Employee
   alias EventSourcing.Aggregate
 
   @timeoff_requests_keys [
