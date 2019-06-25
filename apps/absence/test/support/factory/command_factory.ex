@@ -27,6 +27,10 @@ defmodule Absence.Factory.CommandFactory do
     }
   end
 
+  def set_team_leader_factory do
+    %Commands.SetTeamLeader{}
+  end
+
   def request_timeoff_factory do
     %Commands.RequestTimeoff{
       start_date: ~D[2019-01-01],
@@ -44,5 +48,9 @@ defmodule Absence.Factory.CommandFactory do
 
   def reject_timeoff_request_factory do
     %Commands.RejectTimeoffRequest{}
+  end
+
+  def make_team_leader_factory do
+    %Commands.MakeTeamLeader{}
   end
 end
