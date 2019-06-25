@@ -34,6 +34,7 @@ defmodule EventSourcing.Aggregate.AggregateServer do
     state = %__MODULE__{
       aggregate_uuid: Keyword.fetch!(opts, :aggregate_uuid),
       aggregate_mod: Keyword.fetch!(opts, :aggregate_mod),
+      aggregate_state: Keyword.get(opts, :aggregate_state),
       store_mod: Keyword.get(opts, :event_store, @event_store),
       uuid_generator_mod: Keyword.get(opts, :uuid_generator, @uuid_generator)
     }
@@ -54,6 +55,8 @@ defmodule EventSourcing.Aggregate.AggregateServer do
   def handle_call(:get, _from, state) do
     {:reply, state.aggregate_state, state}
   end
+
+  defp build_aggregate(%{aggregate_state: %mod{}, aggregate_mod: mod} = state), do: state
 
   defp build_aggregate(state) do
     %{store_mod: store_mod, aggregate_mod: aggregate_mod, aggregate_uuid: aggregate_uuid} = state

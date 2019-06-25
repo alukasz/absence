@@ -2,7 +2,6 @@ defmodule EventSourcing.AggregateTest do
   use ExUnit.Case
 
   alias EventSourcing.Aggregate
-  alias EventSourcing.Aggregate.AggregateServer
   alias EventSourcing.Context
   alias EventSourcing.EventHandler
   alias EventSourcing.Counters.Aggregates.Counter
@@ -11,6 +10,7 @@ defmodule EventSourcing.AggregateTest do
   alias EventSourcing.EventStore.EventStoreMock
   alias EventSourcing.EventHandlerMock
   alias EventSourcing.UUID
+  alias EventSourcing.AggregateHelper
 
   @registry EventSourcing.AggregateRegistry
 
@@ -132,15 +132,9 @@ defmodule EventSourcing.AggregateTest do
     start_aggregate(aggregate)
   end
 
-  defp start_aggregate({mod, uuid} = aggregate) do
-    opts = [
-      aggregate_mod: mod,
-      aggregate_uuid: uuid,
-      event_store: EventStoreMock,
-      uuid_generator: UUID
-    ]
-
-    {:ok, pid} = start_supervised({AggregateServer, opts}, id: aggregate)
+  defp start_aggregate({mod, uuid}) do
+    aggregate = struct(mod, uuid: uuid)
+    pid = AggregateHelper.start_aggregate(aggregate, event_store: EventStoreMock)
 
     {aggregate, pid}
   end

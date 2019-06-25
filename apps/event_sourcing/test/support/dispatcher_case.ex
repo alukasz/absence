@@ -5,11 +5,11 @@ defmodule EventSourcing.DispatcherCase do
     quote do
       import EventSourcing.DataCase, only: [errors_on: 1]
       import EventSourcing.DispatcherCase
+      import EventSourcing.AggregateHelper
     end
   end
 
   setup do
-    EventSourcing.EventStore.AgentEventStore.__reset__()
     start_supervised!({EventSourcing.FakeDispatcher, name: self()})
 
     :ok
