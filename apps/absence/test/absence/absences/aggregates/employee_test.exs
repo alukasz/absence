@@ -7,6 +7,7 @@ defmodule Absence.Absences.Aggregates.EmployeeTest do
   alias Absence.Absences.Events.HoursRemoved
   alias Absence.Absences.Events.TimeoffRequested
   alias Absence.Absences.Events.TeamLeaderSet
+  alias Absence.Absences.Events.TeamLeaderAwarded
   alias Absence.Absences.EventHandlers.TimeoffEventHandler
 
   setup do
@@ -184,6 +185,24 @@ defmodule Absence.Absences.Aggregates.EmployeeTest do
          } do
       assert %{pending_timeoff_requests: []} =
                aggregate_apply(employee, timeoff_request_rejected_event)
+    end
+  end
+
+  describe "making employee a team leader" do
+    test "MakeTeamLeader command generates TeamLeaderAwarded event", %{employee: employee} do
+      command = build_command(:make_team_leader) |> with_employee(employee) |> with_team_leader()
+
+      assert aggregate_execute(employee, command) == %TeamLeaderAwarded{
+               employee_uuid: command.employee_uuid,
+               team_leader_uuid: command.team_leader_uuid
+             }
+    end
+
+    test "TeamLeaderAwarded events sets team leader aggregate uuid", %{employee: employee} do
+      event = build_event(:team_leader_awarded) |> with_employee(employee) |> with_team_leader()
+      team_leader_uuid = event.team_leader_uuid
+
+      assert %{team_leader_aggregate_uuid: ^team_leader_uuid} = aggregate_apply(employee, event)
     end
   end
 end

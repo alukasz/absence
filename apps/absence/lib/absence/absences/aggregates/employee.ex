@@ -6,19 +6,24 @@ defmodule Absence.Absences.Aggregates.Employee do
   alias Absence.Absences.Commands.RemoveHours
   alias Absence.Absences.Commands.SetTeamLeader
   alias Absence.Absences.Commands.RequestTimeoff
+  alias Absence.Absences.Commands.MakeTeamLeader
   alias Absence.Absences.Events.HoursAdded
   alias Absence.Absences.Events.HoursRemoved
   alias Absence.Absences.Events.TeamLeaderSet
   alias Absence.Absences.Events.TimeoffRequested
   alias Absence.Absences.Events.TimeoffRequestApproved
   alias Absence.Absences.Events.TimeoffRequestRejected
+  alias Absence.Absences.Events.TeamLeaderAwarded
   alias Absence.Absences.TimeoffRequest
 
   @type t :: struct()
 
   defstruct [
     :uuid,
-    team_leader_uuid: nil,
+    # team leader that is managing the employee
+    :team_leader_uuid,
+    # team leader aggregate for employee that is team leader
+    :team_leader_aggregate_uuid,
     hours: 0,
     pending_timeoff_requests: [],
     approved_timeoff_requests: [],
@@ -41,7 +46,7 @@ defmodule Absence.Absences.Aggregates.Employee do
 
   def execute(%Employee{} = employee, %SetTeamLeader{} = set_team_leader) do
     %TeamLeaderSet{
-      employee_uuid: employee.employee_uuid,
+      employee_uuid: employee.uuid,
       team_leader_uuid: set_team_leader.team_leader_uuid
     }
   end
@@ -50,6 +55,13 @@ defmodule Absence.Absences.Aggregates.Employee do
     %TimeoffRequested{
       employee_uuid: employee.uuid,
       timeoff_request: TimeoffRequest.from_command(request_timeoff)
+    }
+  end
+
+  def execute(%Employee{} = employee, %MakeTeamLeader{} = make_team_leader) do
+    %TeamLeaderAwarded{
+      employee_uuid: employee.uuid,
+      team_leader_uuid: make_team_leader.team_leader_uuid
     }
   end
 
@@ -79,6 +91,10 @@ defmodule Absence.Absences.Aggregates.Employee do
     %TimeoffRequestRejected{timeoff_request: timeoff_request} = event
     employee = remove_pending_timeoff_request(employee, timeoff_request)
     update_in(employee.rejected_timeoff_requests, &[timeoff_request | &1])
+  end
+
+  def apply(%Employee{} = employee, %TeamLeaderAwarded{team_leader_uuid: uuid}) do
+    %{employee | team_leader_aggregate_uuid: uuid}
   end
 
   defp remove_pending_timeoff_request(employee, %{uuid: uuid}) do

@@ -49,4 +49,8 @@ defmodule Absence.Factory.CommandFactory do
   def reject_timeoff_request_factory do
     %Commands.RejectTimeoffRequest{}
   end
+
+  def make_team_leader_factory do
+    %Commands.MakeTeamLeader{}
+  end
 end
