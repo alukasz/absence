@@ -4,9 +4,11 @@ defmodule Absence.Absences.Aggregates.Employee do
   alias __MODULE__
   alias Absence.Absences.Commands.AddHours
   alias Absence.Absences.Commands.RemoveHours
+  alias Absence.Absences.Commands.SetTeamLeader
   alias Absence.Absences.Commands.RequestTimeoff
   alias Absence.Absences.Events.HoursAdded
   alias Absence.Absences.Events.HoursRemoved
+  alias Absence.Absences.Events.TeamLeaderSet
   alias Absence.Absences.Events.TimeoffRequested
   alias Absence.Absences.Events.TimeoffRequestApproved
   alias Absence.Absences.Events.TimeoffRequestRejected
@@ -37,6 +39,13 @@ defmodule Absence.Absences.Aggregates.Employee do
     }
   end
 
+  def execute(%Employee{} = employee, %SetTeamLeader{} = set_team_leader) do
+    %TeamLeaderSet{
+      employee_uuid: employee.employee_uuid,
+      team_leader_uuid: set_team_leader.team_leader_uuid
+    }
+  end
+
   def execute(%Employee{} = employee, %RequestTimeoff{} = request_timeoff) do
     %TimeoffRequested{
       employee_uuid: employee.uuid,
@@ -50,6 +59,10 @@ defmodule Absence.Absences.Aggregates.Employee do
 
   def apply(%Employee{} = employee, %HoursRemoved{hours: hours}) do
     %{employee | hours: employee.hours - hours}
+  end
+
+  def apply(%Employee{} = employee, %TeamLeaderSet{team_leader_uuid: uuid}) do
+    %{employee | team_leader_uuid: uuid}
   end
 
   def apply(%Employee{} = employee, %TimeoffRequested{} = event) do

@@ -15,6 +15,10 @@ defmodule Absence.Factory.EventFactory do
     }
   end
 
+  def team_leader_set_factory do
+    %Events.TeamLeaderSet{}
+  end
+
   def timeoff_requested_factory do
     %Events.TimeoffRequested{}
   end
