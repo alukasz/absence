@@ -4,8 +4,9 @@ defmodule Absence.AbsencesTest do
   import Absence.Factory
 
   alias Absence.Absences
-  alias Absence.Absences.Commands
   alias Absence.Absences.Aggregates.Employee
+  alias Absence.Absences.Commands
+  alias Absence.Absences.Commands
 
   describe "request_timeoff/0" do
     test "returns chagenset" do
@@ -14,16 +15,14 @@ defmodule Absence.AbsencesTest do
   end
 
   describe "request_timeoff/2" do
-    setup do
-      {:ok, employee_uuid: EventSourcing.UUID.generate()}
-    end
+    setup :employee
 
     test "with valid params builds and dispatches command", %{employee_uuid: employee_uuid} do
       params = string_params_for_command(:request_timeoff)
       start_date = params["start_date"]
       end_date = params["end_date"]
 
-      Absences.request_timeoff(employee_uuid, params)
+      assert :ok = Absences.request_timeoff(employee_uuid, params)
 
       assert_dispatched %Commands.RequestTimeoff{
         employee_uuid: ^employee_uuid,
@@ -37,7 +36,7 @@ defmodule Absence.AbsencesTest do
     } do
       params = string_params_for_command(:request_timeoff)
 
-      Absences.request_timeoff(employee_uuid, params)
+      assert :ok = Absences.request_timeoff(employee_uuid, params)
 
       assert_dispatched Employee, ^employee_uuid, _
     end
@@ -80,5 +79,16 @@ defmodule Absence.AbsencesTest do
 
       assert "must be after start date" in errors_on(changeset).end_date
     end
+  end
+
+  defp employee(_) do
+    employee = %Employee{
+      uuid: EventSourcing.UUID.generate(),
+      team_leader_uuid: EventSourcing.UUID.generate()
+    }
+
+    start_aggregate(employee)
+
+    {:ok, employee_uuid: employee.uuid}
   end
 end
