@@ -1,6 +1,8 @@
 <h1>Request timeoff</h1>
 
 <%= form_for @timeoff_request, Routes.timeoff_path(@conn, :create), [as: "timeoff_request"], fn f -> %>
+  <%= error_tag f, :employee_uuid %>
+
   <div class="form-group">
     <%= label f, :start_date, "Start date" %>
     <%= date_input f, :start_date %>
