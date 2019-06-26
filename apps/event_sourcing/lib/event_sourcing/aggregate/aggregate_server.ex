@@ -85,7 +85,7 @@ defmodule EventSourcing.Aggregate.AggregateServer do
   end
 
   defp build_result(state, event) do
-    {event, state.aggregate_state}
+    {:ok, event, state.aggregate_state}
   end
 
   defp store_event(state, event) do

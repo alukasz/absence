@@ -43,19 +43,19 @@ defmodule EventSourcing.AggregateTest do
     end
 
     test "returns event", %{aggregate: aggregate, command: command, context: context} do
-      assert {%Incremented{}, _} = Aggregate.execute_command(aggregate, command, context)
+      assert {:ok, %Incremented{}, _} = Aggregate.execute_command(aggregate, command, context)
     end
 
     test "generates UUID for event", %{aggregate: aggregate, command: command, context: context} do
       start_aggregate(aggregate)
 
-      assert {event, _} = Aggregate.execute_command(aggregate, command, context)
+      assert {:ok, event, _} = Aggregate.execute_command(aggregate, command, context)
 
       refute event.uuid == nil
     end
 
     test "returns updated aggregate", %{aggregate: aggregate, command: command, context: context} do
-      assert {_, %Counter{value: 1}} = Aggregate.execute_command(aggregate, command, context)
+      assert {:ok, _, %Counter{value: 1}} = Aggregate.execute_command(aggregate, command, context)
     end
 
     test "starts process for aggregate", %{command: command, context: context} do
@@ -96,7 +96,7 @@ defmodule EventSourcing.AggregateTest do
     } do
       start_aggregate(aggregate)
 
-      {event, _} = Aggregate.execute_command(aggregate, command, context)
+      {:ok, event, _} = Aggregate.execute_command(aggregate, command, context)
 
       assert_receive {:store_put, ^uuid, ^event}
     end
@@ -108,7 +108,7 @@ defmodule EventSourcing.AggregateTest do
     } do
       EventHandler.register_handler(Incremented, EventHandlerMock)
 
-      {event, _aggregate} = Aggregate.execute_command(aggregate, command, context)
+      {:ok, event, _aggregate} = Aggregate.execute_command(aggregate, command, context)
 
       assert_receive {:event_handler_called, ^event, %Counter{}}
     end

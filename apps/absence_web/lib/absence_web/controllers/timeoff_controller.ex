@@ -4,6 +4,7 @@ defmodule AbsenceWeb.TimeoffController do
   @absences Application.get_env(:absence_web, :absences)
 
   plug AbsenceWeb.RequireUser
+  plug AbsenceWeb.AuthorizePlug, AbsenceWeb.TimeoffPolicy
   plug :scrub_params, "timeoff_request" when action == :create
 
   def index(conn, _) do

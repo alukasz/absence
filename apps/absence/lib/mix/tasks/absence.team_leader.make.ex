@@ -1,15 +1,17 @@
-defmodule Mix.Tasks.Absence.TeamLeader.Set do
-  @shortdoc "Sets employee's team leader"
+defmodule Mix.Tasks.Absence.TeamLeader.Make do
+  @shortdoc "Makes employee a team leader"
 
   use Mix.Task
 
-  alias Absence.Absences.Commands.SetTeamLeader
+  alias Absence.Absences.Commands.MakeTeamLeader
 
-  def run([employee_uuid, team_leader_uuid]) do
-    %SetTeamLeader{
-      employee_uuid: employee_uuid,
-      team_leader_uuid: team_leader_uuid
-    }
-    |> Absence.Dispatcher.dispatch()
+  def run([employee_uuid]) do
+    Application.ensure_all_started(:absence)
+
+    :ok =
+      Absence.Dispatcher.dispatch(%MakeTeamLeader{
+        employee_uuid: employee_uuid,
+        team_leader_uuid: EventSourcing.UUID.generate()
+      })
   end
 end
