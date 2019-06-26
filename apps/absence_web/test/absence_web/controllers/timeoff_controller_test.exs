@@ -6,6 +6,8 @@ defmodule AbsenceWeb.TimeoffControllerTest do
 
   alias Absence.AbsencesMock
   alias Absence.Absences.Commands
+  alias Absence.Absences.Aggregates.Employee
+  alias Absence.Absences.Aggregates.TeamLeader
 
   setup :verify_on_exit!
 
@@ -35,6 +37,8 @@ defmodule AbsenceWeb.TimeoffControllerTest do
   end
 
   describe "#new" do
+    setup :employee_team_leader
+
     test "renders registration form", %{conn: conn} do
       expect(AbsencesMock, :request_timeoff, 1, fn -> changeset() end)
       conn = authenticate(conn)
@@ -47,14 +51,27 @@ defmodule AbsenceWeb.TimeoffControllerTest do
       assert html_response(conn, 200) =~ "Submit"
     end
 
+    test "user must have a team leader", %{conn: conn} do
+      stub(AbsencesMock, :get_employee_team_leader, fn _ -> nil end)
+      conn = authenticate(conn)
+
+      conn = get(conn, timeoff_path(conn, :new))
+
+      assert redirected_to_homepage(conn)
+      assert get_flash(conn, :error) =~ "authorized"
+    end
+
     test "redirects to login page when user is not authenticated", %{conn: conn} do
       conn = get(conn, timeoff_path(conn, :new))
 
       assert redirected_to_login_page(conn)
+      assert get_flash(conn, :error) =~ "authenticated"
     end
   end
 
   describe "#create" do
+    setup :employee_team_leader
+
     test "with valid params redirects to #index page", %{conn: conn} do
       conn = authenticate(conn)
       user = current_user(conn)
@@ -85,14 +102,32 @@ defmodule AbsenceWeb.TimeoffControllerTest do
       assert html_response(conn, 200) =~ "Submit"
     end
 
+    test "user must have a team leader", %{conn: conn} do
+      stub(AbsencesMock, :get_employee_team_leader, fn _ -> nil end)
+      conn = authenticate(conn)
+
+      conn = post(conn, timeoff_path(conn, :create), %{timeoff_request: @valid_params})
+
+      assert redirected_to_homepage(conn)
+      assert get_flash(conn, :error) =~ "authorized"
+    end
+
     test "redirects to login page when user is not authenticated", %{conn: conn} do
       conn = get(conn, timeoff_path(conn, :new))
 
       assert redirected_to_login_page(conn)
+      assert get_flash(conn, :error) =~ "authenticated"
     end
   end
 
   def changeset do
     Ecto.Changeset.change(Commands.RequestTimeoff.__schema__())
+  end
+
+  defp employee_team_leader(_) do
+    stub(AbsencesMock, :get_employee, fn _ -> %Employee{} end)
+    stub(AbsencesMock, :get_employee_team_leader, fn _ -> %TeamLeader{} end)
+
+    :ok
   end
 end

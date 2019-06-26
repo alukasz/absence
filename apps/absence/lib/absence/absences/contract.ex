@@ -6,6 +6,12 @@ defmodule Absence.Absences.Contract do
 
   @type subject :: UUID.t() | User.t() | Employee.t()
 
+  @callback get_employee(User.t()) :: Employee.t()
+
+  @callback get_employee_team_leader(Employee.t()) :: TeamLeader.t()
+
+  @callback get_team_leader(User.t() | Employee.t()) :: TeamLeader.t() | nil
+
   @callback get_timeoff_requests(subject()) :: [TimeoffRequest.t()]
 
   @callback request_timeoff() :: Changeset.t()

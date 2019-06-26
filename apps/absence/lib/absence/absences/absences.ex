@@ -2,16 +2,26 @@ defmodule Absence.Absences do
   @behaviour Absence.Absences.Contract
 
   alias Absence.Dispatcher
+  alias Absence.Absences.Employees
+  alias Absence.Absences.TeamLeaders
   alias Absence.Absences.Aggregates.Employee
   alias Absence.Absences.Commands
   alias Absence.Absences.Contract
-  alias EventSourcing.Aggregate
 
   @timeoff_requests_keys [
     :pending_timeoff_requests,
     :approved_timeoff_requests,
     :rejected_timeoff_requests
   ]
+
+  @impl Contract
+  defdelegate get_employee(user), to: Employees, as: :get
+
+  @impl Contract
+  defdelegate get_employee_team_leader(user), to: Employees, as: :get_team_leader
+
+  @impl Contract
+  defdelegate get_team_leader(user), to: TeamLeaders, as: :get
 
   @impl Contract
   def get_timeoff_requests(subject) do
@@ -33,18 +43,6 @@ defmodule Absence.Absences do
     |> put_employee(subject)
     |> Commands.RequestTimeoff.build()
     |> Dispatcher.dispatch()
-  end
-
-  defp get_employee(%Absence.Accounts.User{employee_uuid: employee_uuid}) do
-    Aggregate.get({Employee, employee_uuid})
-  end
-
-  defp get_employee(employee_uuid) when is_binary(employee_uuid) do
-    Aggregate.get({Employee, employee_uuid})
-  end
-
-  defp get_employee(%Employee{uuid: employee_uuid}) do
-    Aggregate.get({Employee, employee_uuid})
   end
 
   defp put_employee(params, %Absence.Accounts.User{employee_uuid: employee_uuid}) do

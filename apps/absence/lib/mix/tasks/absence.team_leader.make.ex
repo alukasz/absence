@@ -6,6 +6,8 @@ defmodule Mix.Tasks.Absence.TeamLeader.Make do
   alias Absence.Absences.Commands.MakeTeamLeader
 
   def run([employee_uuid]) do
+    Application.ensure_all_started(:absence)
+
     :ok =
       Absence.Dispatcher.dispatch(%MakeTeamLeader{
         employee_uuid: employee_uuid,
