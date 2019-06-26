@@ -37,7 +37,7 @@ defmodule EventSourcing.Dispatcher do
         }
 
         case Aggregate.execute_command({unquote(aggregate_mod), aggregate_uuid}, command, context) do
-          {_, _} -> :ok
+          {:ok, _, _} -> :ok
           error -> error
         end
       end
