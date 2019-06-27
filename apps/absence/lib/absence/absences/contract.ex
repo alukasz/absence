@@ -1,6 +1,5 @@
 defmodule Absence.Absences.Contract do
   alias Ecto.Changeset
-  alias EventSourcing.UUID
   alias Absence.Absences.TimeoffRequest
   alias Absence.Accounts.User
 
@@ -13,4 +12,10 @@ defmodule Absence.Absences.Contract do
 
   @callback request_timeoff() :: Changeset.t()
   @callback request_timeoff(User.t(), map()) :: :ok | {:error, Changeset.t()}
+
+  @callback approve_timeoff_request() :: Changeset.t()
+  @callback approve_timeoff_request(User.t(), map()) :: :ok | {:error, Changeset.t()}
+
+  @callback reject_timeoff_request() :: Changeset.t()
+  @callback reject_timeoff_request(User.t(), map()) :: :ok | {:error, Changeset.t()}
 end

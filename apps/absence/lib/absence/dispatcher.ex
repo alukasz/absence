@@ -6,6 +6,8 @@ defmodule Absence.Dispatcher do
   alias Absence.Absences.Commands.AddHours
   alias Absence.Absences.Commands.RequestTimeoff
   alias Absence.Absences.Commands.ReviewTimeoffRequest
+  alias Absence.Absences.Commands.ApproveTimeoffRequest
+  alias Absence.Absences.Commands.RejectTimeoffRequest
   alias Absence.Absences.Commands.SetTeamLeader
   alias Absence.Absences.Commands.MakeTeamLeader
 
@@ -15,4 +17,6 @@ defmodule Absence.Dispatcher do
   dispatch MakeTeamLeader, to: Employee, identity: :employee_uuid
 
   dispatch ReviewTimeoffRequest, to: TeamLeader, identity: :team_leader_uuid
+  dispatch ApproveTimeoffRequest, to: TeamLeader, identity: :team_leader_uuid
+  dispatch RejectTimeoffRequest, to: TeamLeader, identity: :team_leader_uuid
 end

@@ -4,4 +4,8 @@ defmodule AbsenceWeb.Admin.TimeoffPolicy do
   def index(user) do
     team_leader?(user)
   end
+
+  def update(user) do
+    team_leader?(user)
+  end
 end

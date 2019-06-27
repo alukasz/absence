@@ -5,6 +5,7 @@ defmodule Absence.Absences do
   alias Absence.Absences.Contract
   alias Absence.Absences.Employees
   alias Absence.Absences.TeamLeaders
+  alias Absence.Accounts.User
   alias Absence.Dispatcher
 
   @impl Contract
@@ -47,7 +48,33 @@ defmodule Absence.Absences do
     |> Dispatcher.dispatch()
   end
 
-  defp put_employee(params, %Absence.Accounts.User{employee_uuid: uuid}) do
+  @impl Contract
+  def approve_timeoff_request, do: Commands.ApproveTimeoffRequest.changeset()
+
+  @impl Contract
+  def approve_timeoff_request(user, timeoff_params) do
+    timeoff_params
+    |> put_team_leader(user)
+    |> Commands.ApproveTimeoffRequest.build()
+    |> Dispatcher.dispatch()
+  end
+
+  @impl Contract
+  def reject_timeoff_request, do: Commands.RejectTimeoffRequest.changeset()
+
+  @impl Contract
+  def reject_timeoff_request(user, timeoff_params) do
+    timeoff_params
+    |> put_team_leader(user)
+    |> Commands.RejectTimeoffRequest.build()
+    |> Dispatcher.dispatch()
+  end
+
+  defp put_employee(params, %User{employee_uuid: uuid}) do
     Map.put(params, "employee_uuid", uuid)
+  end
+
+  defp put_team_leader(params, %User{} = user) do
+    Map.put(params, "team_leader_uuid", get_team_leader(user).uuid)
   end
 end

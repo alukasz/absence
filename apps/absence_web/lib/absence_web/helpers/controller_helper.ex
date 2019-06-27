@@ -1,6 +1,5 @@
 defmodule AbsenceWeb.ControllerHelper do
   alias Absence.Accounts.User
-  alias Absence.Absences.Aggregates.Employee
   alias Absence.Absences.Aggregates.TeamLeader
 
   @absences Application.get_env(:absence_web, :absences)
@@ -18,10 +17,7 @@ defmodule AbsenceWeb.ControllerHelper do
   end
 
   def has_team_leader?(%User{} = user) do
-    case employee_team_leader(user) do
-      %TeamLeader{} -> true
-      _ -> false
-    end
+    match?(%TeamLeader{}, employee_team_leader(user))
   end
 
   def team_leader(%User{} = user) do

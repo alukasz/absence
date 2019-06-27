@@ -8,8 +8,26 @@ defmodule AbsenceWeb.Admin.TimeoffController do
   plug :scrub_params, "timeoff_request" when action == :create
 
   def index(conn, _) do
-    timeoff_requests = @absences.get_team_leader_timeoff_requests(current_user(conn))
+    render(conn, "index.html",
+      timeoff_requests: @absences.get_team_leader_timeoff_requests(current_user(conn)),
+      approve_changeset: @absences.approve_timeoff_request(),
+      reject_changeset: @absences.reject_timeoff_request()
+    )
+  end
 
-    render(conn, "index.html", timeoff_requests: timeoff_requests)
+  def update(conn, %{"approve_timeoff_request" => params}) do
+    :ok = @absences.approve_timeoff_request(current_user(conn), params)
+
+    conn
+    |> put_flash(:info, "Timeoff accepted")
+    |> redirect(to: Routes.admin_timeoff_path(conn, :index))
+  end
+
+  def update(conn, %{"reject_timeoff_request" => params}) do
+    :ok = @absences.reject_timeoff_request(current_user(conn), params)
+
+    conn
+    |> put_flash(:info, "Timeoff rejected")
+    |> redirect(to: Routes.admin_timeoff_path(conn, :index))
   end
 end

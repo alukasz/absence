@@ -1,6 +1,6 @@
 <h1>Timeoff requests</h1>
 
-<table class="table">
+<table>
   <tr>
     <th>Employee</th>
     <th>Stard date</th>
@@ -15,7 +15,12 @@
       <td><%= Date.to_string(request.start_date) %></td>
       <td><%= Date.to_string(request.end_date) %></td>
       <td><%= request.status %></td>
-      <td>..</td>
+      <td>
+        <%= if pending?(request) do %>
+          <%= approve_timeoff_request_form(@conn, @approve_changeset, request) %>
+          <%= reject_timeoff_request_form(@conn, @approve_changeset, request) %>
+          <% end %>
+      </td>
     </tr>
   <% end %>
 </table>

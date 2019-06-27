@@ -25,7 +25,7 @@ defmodule AbsenceWeb.Router do
     resources "/timeoff", TimeoffController, only: [:new, :create]
 
     scope "/admin", Admin, as: :admin do
-      resources "/timeoff", TimeoffController, only: [:index, :new, :create]
+      resources "/timeoff", TimeoffController, only: [:index, :update]
     end
   end
 

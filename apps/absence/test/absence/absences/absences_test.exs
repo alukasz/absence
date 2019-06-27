@@ -5,8 +5,10 @@ defmodule Absence.AbsencesTest do
 
   alias Absence.Absences
   alias Absence.Absences.Aggregates.Employee
+  alias Absence.Absences.Aggregates.TeamLeader
   alias Absence.Absences.Commands
   alias Absence.Absences.Commands
+  alias EventSourcing.UUID
 
   describe "request_timeoff/0" do
     test "returns chagenset" do
@@ -80,14 +82,80 @@ defmodule Absence.AbsencesTest do
     end
   end
 
+  describe "approve_timeoff_request/0" do
+    test "returns changeset" do
+      assert %Ecto.Changeset{} = Absences.approve_timeoff_request()
+    end
+  end
+
+  describe "approve_timeoff_request/2" do
+    setup :team_leader
+
+    test "dispatches command", %{user: user, employee: employee, team_leader: team_leader} do
+      team_leader_uuid = team_leader.uuid
+
+      params =
+        string_params_for_command(:approve_timeoff_request)
+        |> with_employee(employee)
+        |> with_timeoff_request()
+
+      assert :ok = Absences.approve_timeoff_request(user, params)
+
+      assert_dispatched TeamLeader, ^team_leader_uuid, %Commands.ApproveTimeoffRequest{}
+    end
+  end
+
+  describe "reject_timeoff_request/0" do
+    test "returns changeset" do
+      assert %Ecto.Changeset{} = Absences.reject_timeoff_request()
+    end
+  end
+
+  describe "reject_timeoff_request/2" do
+    setup :team_leader
+
+    test "dispatches command", %{user: user, employee: employee, team_leader: team_leader} do
+      team_leader_uuid = team_leader.uuid
+
+      params =
+        string_params_for_command(:reject_timeoff_request)
+        |> with_employee(employee)
+        |> with_timeoff_request()
+
+      assert :ok = Absences.reject_timeoff_request(user, params)
+
+      assert_dispatched TeamLeader, ^team_leader_uuid, %Commands.RejectTimeoffRequest{}
+    end
+  end
+
   defp employee(_) do
     employee = %Employee{
-      uuid: EventSourcing.UUID.generate(),
-      team_leader_uuid: EventSourcing.UUID.generate()
+      uuid: UUID.generate(),
+      team_leader_uuid: UUID.generate()
     }
 
     start_aggregate(employee)
+    user = build(:user) |> with_employee(employee)
 
-    {:ok, user: build(:user) |> with_employee(employee)}
+    {:ok, user: user, employee: employee}
+  end
+
+  def team_leader(_) do
+    team_leader = %TeamLeader{
+      uuid: UUID.generate()
+    }
+
+    start_aggregate(team_leader)
+
+    employee = %Employee{
+      uuid: UUID.generate(),
+      team_leader_uuid: UUID.generate(),
+      team_leader_aggregate_uuid: team_leader.uuid
+    }
+
+    start_aggregate(employee)
+    user = build(:user) |> with_employee(employee)
+
+    {:ok, user: user, employee: employee, team_leader: team_leader}
   end
 end
