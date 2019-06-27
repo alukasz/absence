@@ -36,6 +36,10 @@ defmodule Absence.Factory do
     %{factory | team_leader_uuid: team_leader.uuid}
   end
 
+  def with_uuid(%{} = factory, uuid \\ EventSourcing.UUID.generate()) do
+    %{factory | uuid: uuid}
+  end
+
   @password "P@ssw0rd"
 
   def user_factory do

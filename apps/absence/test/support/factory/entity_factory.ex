@@ -7,7 +7,7 @@ defmodule Absence.Factory.EntityFactory do
 
   def timeoff_request_factory do
     %TimeoffRequest{
-      uuid: @uuid_generator.generate(),
+      uuid: EventSourcing.UUID.generate(),
       start_date: ~D[2019-01-01],
       end_date: ~D[2019-01-10],
       status: :pending

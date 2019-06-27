@@ -12,7 +12,6 @@ defmodule Absence.Absences.Aggregates.TeamLeaderTest do
     team_leader = build_aggregate(:team_leader)
     employee = build_aggregate(:employee)
     timeoff_request = build_entity(:timeoff_request) |> with_employee(employee)
-    employee = %{employee | pending_timeoff_requests: [timeoff_request]}
 
     {:ok, employee: employee, team_leader: team_leader, timeoff_request: timeoff_request}
   end
@@ -45,13 +44,15 @@ defmodule Absence.Absences.Aggregates.TeamLeaderTest do
   end
 
   describe "approving timeoff requests" do
+    setup :review_timeoff_request
+
     test "ApproveTimeoffRequest approves time off for specified employee", %{
       employee: employee,
       team_leader: team_leader,
       timeoff_request: timeoff_request
     } do
       command =
-        build_command(:approve_timeoff_request, timeoff_request: timeoff_request)
+        build_command(:approve_timeoff_request, timeoff_request_uuid: timeoff_request.uuid)
         |> with_employee(employee)
         |> with_team_leader(team_leader)
 
@@ -93,13 +94,15 @@ defmodule Absence.Absences.Aggregates.TeamLeaderTest do
   end
 
   describe "rejecting timeoff requests" do
+    setup :review_timeoff_request
+
     test "RejectTimeoffRequest rejects time off for specified employee", %{
       employee: employee,
       team_leader: team_leader,
       timeoff_request: timeoff_request
     } do
       command =
-        build_command(:reject_timeoff_request, timeoff_request: timeoff_request)
+        build_command(:reject_timeoff_request, timeoff_request_uuid: timeoff_request.uuid)
         |> with_employee(employee)
         |> with_team_leader(team_leader)
 
@@ -138,5 +141,10 @@ defmodule Absence.Absences.Aggregates.TeamLeaderTest do
 
       assert %{review_timeoff_requests: []} = TeamLeader.apply(team_leader, event)
     end
+  end
+
+  defp review_timeoff_request(%{team_leader: team_leader, timeoff_request: timeoff_request}) do
+    team_leader = %{team_leader | review_timeoff_requests: [timeoff_request]}
+    {:ok, team_leader: team_leader}
   end
 end

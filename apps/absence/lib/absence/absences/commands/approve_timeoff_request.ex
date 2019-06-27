@@ -1,8 +1,9 @@
 defmodule Absence.Absences.Commands.ApproveTimeoffRequest do
-  defstruct [
-    :uuid,
-    :employee_uuid,
-    :team_leader_uuid,
-    :timeoff_request
-  ]
+  use EventSourcing.Command
+
+  command do
+    field :employee_uuid, EventSourcing.UUID
+    field :team_leader_uuid, EventSourcing.UUID
+    field :timeoff_request_uuid, EventSourcing.UUID
+  end
 end

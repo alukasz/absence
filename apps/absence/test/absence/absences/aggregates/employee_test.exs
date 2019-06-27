@@ -13,7 +13,7 @@ defmodule Absence.Absences.Aggregates.EmployeeTest do
   setup do
     employee = build_aggregate(:employee)
     team_leader = build_aggregate(:team_leader)
-    timeoff_request = build_entity(:timeoff_request) |> with_employee(employee)
+    timeoff_request = build_entity(:timeoff_request) |> with_employee(employee) |> with_uuid(nil)
 
     {:ok, employee: employee, team_leader: team_leader, timeoff_request: timeoff_request}
   end
