@@ -17,12 +17,13 @@ defmodule Absence.AbsencesTest do
   describe "request_timeoff/2" do
     setup :employee
 
-    test "with valid params builds and dispatches command", %{employee_uuid: employee_uuid} do
+    test "with valid params builds and dispatches command", %{user: user} do
       params = string_params_for_command(:request_timeoff)
+      employee_uuid = user.employee_uuid
       start_date = params["start_date"]
       end_date = params["end_date"]
 
-      assert :ok = Absences.request_timeoff(employee_uuid, params)
+      assert :ok = Absences.request_timeoff(user, params)
 
       assert_dispatched %Commands.RequestTimeoff{
         employee_uuid: ^employee_uuid,
@@ -31,51 +32,49 @@ defmodule Absence.AbsencesTest do
       }
     end
 
-    test "with valid params dispatches command Employee aggregate", %{
-      employee_uuid: employee_uuid
-    } do
+    test "with valid params dispatches command Employee aggregate", %{user: user} do
       params = string_params_for_command(:request_timeoff)
+      employee_uuid = user.employee_uuid
 
-      assert :ok = Absences.request_timeoff(employee_uuid, params)
+      assert :ok = Absences.request_timeoff(user, params)
 
       assert_dispatched Employee, ^employee_uuid, _
     end
 
     for field <- [:start_date, :end_date] do
-      test "#{field} is required", %{employee_uuid: employee_uuid} do
+      test "#{field} is required", %{user: user} do
         params = string_params_for_command(:request_timeoff, %{unquote(field) => nil})
 
-        assert {:error, changeset} = Absences.request_timeoff(employee_uuid, params)
+        assert {:error, changeset} = Absences.request_timeoff(user, params)
 
         assert "can't be blank" in errors_on(changeset)[unquote(field)]
       end
     end
 
-    test "employee_uuid is required" do
+    test "user is required" do
       params = string_params_for_command(:request_timeoff)
 
-      assert {:error, changeset} = Absences.request_timeoff("", params)
+      assert {:error, changeset} = Absences.request_timeoff(build(:user), params)
 
       assert "can't be blank" in errors_on(changeset).employee_uuid
     end
 
-    test "start_date can be equal to end date", %{employee_uuid: employee_uuid} do
+    test "start_date can be equal to end date", %{user: user} do
       date = ~D[2019-04-10]
 
       params = string_params_for_command(:request_timeoff, start_date: date, end_date: date)
 
-      assert Absences.request_timeoff(employee_uuid, params)
+      assert Absences.request_timeoff(user, params)
     end
 
-    test "start date must be before end date", %{employee_uuid: employee_uuid} do
+    test "start date must be before end date", %{user: user} do
       params =
         string_params_for_command(:request_timeoff,
           start_date: ~D[2019-04-10],
           end_date: ~D[2019-04-09]
         )
 
-      assert {:error, %Ecto.Changeset{} = changeset} =
-               Absences.request_timeoff(employee_uuid, params)
+      assert {:error, %Ecto.Changeset{} = changeset} = Absences.request_timeoff(user, params)
 
       assert "must be after start date" in errors_on(changeset).end_date
     end
@@ -89,6 +88,6 @@ defmodule Absence.AbsencesTest do
 
     start_aggregate(employee)
 
-    {:ok, employee_uuid: employee.uuid}
+    {:ok, user: build(:user) |> with_employee(employee)}
   end
 end

@@ -8,8 +8,7 @@ defmodule AbsenceWeb.Admin.TimeoffController do
   plug :scrub_params, "timeoff_request" when action == :create
 
   def index(conn, _) do
-    # timeoff_requests = @absences.get_team_leader_timeoff_requests(current_user(conn))
-    timeoff_requests = @absences.get_timeoff_requests(current_user(conn))
+    timeoff_requests = @absences.get_team_leader_timeoff_requests(current_user(conn))
 
     render(conn, "index.html", timeoff_requests: timeoff_requests)
   end

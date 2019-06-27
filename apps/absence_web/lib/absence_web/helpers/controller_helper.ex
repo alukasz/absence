@@ -13,15 +13,12 @@ defmodule AbsenceWeb.ControllerHelper do
     @absences.get_employee(user)
   end
 
-  def employee_team_leader(%Employee{} = employee) do
-    @absences.get_employee_team_leader(employee)
+  def employee_team_leader(%User{} = user) do
+    @absences.get_employee_team_leader(user)
   end
 
   def has_team_leader?(%User{} = user) do
-    user
-    |> employee()
-    |> employee_team_leader()
-    |> case do
+    case employee_team_leader(user) do
       %TeamLeader{} -> true
       _ -> false
     end
