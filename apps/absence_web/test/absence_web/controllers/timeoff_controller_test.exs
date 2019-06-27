@@ -126,7 +126,8 @@ defmodule AbsenceWeb.TimeoffControllerTest do
 
   defp employee_team_leader(_) do
     stub(AbsencesMock, :get_employee, fn _ -> %Employee{} end)
-    stub(AbsencesMock, :get_employee_team_leader, fn _ -> %TeamLeader{} end)
+    stub(AbsencesMock, :get_employee_team_leader, fn _ -> %Employee{} end)
+    stub(AbsencesMock, :get_team_leader, fn _ -> %TeamLeader{} end)
 
     :ok
   end

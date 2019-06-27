@@ -23,6 +23,10 @@ defmodule AbsenceWeb.Router do
 
     get "/", TimeoffController, :index
     resources "/timeoff", TimeoffController, only: [:new, :create]
+
+    scope "/admin", Admin, as: :admin do
+      resources "/timeoff", TimeoffController, only: [:index, :new, :create]
+    end
   end
 
   # Other scopes may use custom stacks.

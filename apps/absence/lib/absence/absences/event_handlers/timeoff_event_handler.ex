@@ -7,10 +7,10 @@ defmodule Absence.Absences.EventHandlers.TimeoffEventHandler do
   alias Absence.Dispatcher
 
   handle %TimeoffRequested{} = event, %Employee{} = employee do
-    %ReviewTimeoffRequest{
-      team_leader_uuid: employee.team_leader_uuid,
-      timeoff_request: event.timeoff_request
-    }
-    |> Dispatcher.dispatch()
+    :ok =
+      Dispatcher.dispatch(%ReviewTimeoffRequest{
+        team_leader_uuid: employee.team_leader_uuid,
+        timeoff_request: event.timeoff_request
+      })
   end
 end
