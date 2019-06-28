@@ -6,8 +6,6 @@ defmodule AbsenceWeb.TimeoffControllerTest do
 
   alias Absence.AbsencesMock
   alias Absence.Absences.Commands
-  alias Absence.Absences.Aggregates.Employee
-  alias Absence.Absences.Aggregates.TeamLeader
 
   setup :verify_on_exit!
 
@@ -37,6 +35,7 @@ defmodule AbsenceWeb.TimeoffControllerTest do
   end
 
   describe "#new" do
+    setup :employee
     setup :employee_team_leader
 
     test "renders registration form", %{conn: conn} do
@@ -70,6 +69,7 @@ defmodule AbsenceWeb.TimeoffControllerTest do
   end
 
   describe "#create" do
+    setup :employee
     setup :employee_team_leader
 
     test "with valid params redirects to #index page", %{conn: conn} do
@@ -121,13 +121,6 @@ defmodule AbsenceWeb.TimeoffControllerTest do
   end
 
   def changeset do
-    Ecto.Changeset.change(Commands.RequestTimeoff.__schema__())
-  end
-
-  defp employee_team_leader(_) do
-    stub(AbsencesMock, :get_employee, fn _ -> %Employee{} end)
-    stub(AbsencesMock, :get_employee_team_leader, fn _ -> %TeamLeader{} end)
-
-    :ok
+    Commands.RequestTimeoff.changeset()
   end
 end

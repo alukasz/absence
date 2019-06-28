@@ -1,0 +1,26 @@
+<h1>Timeoff requests</h1>
+
+<table>
+  <tr>
+    <th>Employee</th>
+    <th>Stard date</th>
+    <th>End date</th>
+    <th>Status</th>
+    <th>Action</th>
+  </tr>
+
+  <%= for request <- @timeoff_requests do %>
+    <tr>
+      <td><%= request.employee_uuid %></td>
+      <td><%= Date.to_string(request.start_date) %></td>
+      <td><%= Date.to_string(request.end_date) %></td>
+      <td><%= request.status %></td>
+      <td>
+        <%= if pending?(request) do %>
+          <%= approve_timeoff_request_form(@conn, @approve_changeset, request) %>
+          <%= reject_timeoff_request_form(@conn, @approve_changeset, request) %>
+          <% end %>
+      </td>
+    </tr>
+  <% end %>
+</table>

@@ -25,18 +25,24 @@ defmodule Absence.Absences.Aggregates.TeamLeader do
   end
 
   def execute(%TeamLeader{} = team_leader, %ApproveTimeoffRequest{} = approve_timeoff_request) do
+    timeoff_request =
+      find_review_timeoff_request(team_leader, approve_timeoff_request.timeoff_request_uuid)
+
     %TimeoffRequestApproved{
       employee_uuid: approve_timeoff_request.employee_uuid,
       team_leader_uuid: team_leader.uuid,
-      timeoff_request: %{approve_timeoff_request.timeoff_request | status: :approved}
+      timeoff_request: %{timeoff_request | status: :approved}
     }
   end
 
   def execute(%TeamLeader{} = team_leader, %RejectTimeoffRequest{} = reject_timeoff_request) do
+    timeoff_request =
+      find_review_timeoff_request(team_leader, reject_timeoff_request.timeoff_request_uuid)
+
     %TimeoffRequestRejected{
       employee_uuid: reject_timeoff_request.employee_uuid,
       team_leader_uuid: team_leader.uuid,
-      timeoff_request: %{reject_timeoff_request.timeoff_request | status: :rejected}
+      timeoff_request: %{timeoff_request | status: :rejected}
     }
   end
 
@@ -55,6 +61,10 @@ defmodule Absence.Absences.Aggregates.TeamLeader do
     %TimeoffRequestRejected{timeoff_request: timeoff_request} = timeoff_request_rejected
     team_leader = remove_review_timeoff_request(team_leader, timeoff_request)
     update_in(team_leader.rejected_timeoff_requests, &[timeoff_request | &1])
+  end
+
+  defp find_review_timeoff_request(team_leader, uuid) do
+    Enum.find(team_leader.review_timeoff_requests, &(&1.uuid == uuid))
   end
 
   defp remove_review_timeoff_request(team_leader, %{uuid: uuid}) do

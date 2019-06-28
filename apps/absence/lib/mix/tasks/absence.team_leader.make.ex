@@ -7,11 +7,14 @@ defmodule Mix.Tasks.Absence.TeamLeader.Make do
 
   def run([employee_uuid]) do
     Application.ensure_all_started(:absence)
+    uuid = EventSourcing.UUID.generate()
 
     :ok =
       Absence.Dispatcher.dispatch(%MakeTeamLeader{
         employee_uuid: employee_uuid,
-        team_leader_uuid: EventSourcing.UUID.generate()
+        team_leader_uuid: uuid
       })
+
+    IO.puts("Team leader uuid #{uuid}")
   end
 end

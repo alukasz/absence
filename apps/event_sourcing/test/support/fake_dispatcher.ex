@@ -29,6 +29,16 @@ defmodule EventSourcing.FakeDispatcher do
           [{unquote(aggregate_mod), aggregate_uuid, command} | dispatched]
         end)
       end
+
+      def dispatch(%unquote(command_mod){} = command, opts) do
+        aggregate_mod = Keyword.get(opts, :to, unquote(aggregate_mod))
+        identity = Keyword.get(opts, :identity, unquote(identity))
+        aggregate_uuid = Map.fetch!(command, identity)
+
+        Agent.update(EventSourcing.FakeDispatcher.name(), fn dispatched ->
+          [{aggregate_mod, aggregate_uuid, command} | dispatched]
+        end)
+      end
     end
   end
 end

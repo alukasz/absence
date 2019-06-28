@@ -7,6 +7,8 @@ defmodule Absence.Absences.Aggregates.Employee do
   alias Absence.Absences.Commands.SetTeamLeader
   alias Absence.Absences.Commands.RequestTimeoff
   alias Absence.Absences.Commands.MakeTeamLeader
+  alias Absence.Absences.Commands.ApproveTimeoffRequest
+  alias Absence.Absences.Commands.RejectTimeoffRequest
   alias Absence.Absences.Events.HoursAdded
   alias Absence.Absences.Events.HoursRemoved
   alias Absence.Absences.Events.TeamLeaderSet
@@ -58,6 +60,26 @@ defmodule Absence.Absences.Aggregates.Employee do
     }
   end
 
+  def execute(%Employee{} = employee, %ApproveTimeoffRequest{} = event) do
+    timeoff_request = find_pending_timeoff_request(employee, event.timeoff_request_uuid)
+
+    %TimeoffRequestApproved{
+      employee_uuid: event.employee_uuid,
+      team_leader_uuid: event.team_leader_uuid,
+      timeoff_request: %{timeoff_request | status: :approved}
+    }
+  end
+
+  def execute(%Employee{} = employee, %RejectTimeoffRequest{} = event) do
+    timeoff_request = find_pending_timeoff_request(employee, event.timeoff_request_uuid)
+
+    %TimeoffRequestRejected{
+      employee_uuid: event.employee_uuid,
+      team_leader_uuid: event.team_leader_uuid,
+      timeoff_request: %{timeoff_request | status: :rejected}
+    }
+  end
+
   def execute(%Employee{} = employee, %MakeTeamLeader{} = make_team_leader) do
     %TeamLeaderAwarded{
       employee_uuid: employee.uuid,
@@ -95,6 +117,10 @@ defmodule Absence.Absences.Aggregates.Employee do
 
   def apply(%Employee{} = employee, %TeamLeaderAwarded{team_leader_uuid: uuid}) do
     %{employee | team_leader_aggregate_uuid: uuid}
+  end
+
+  defp find_pending_timeoff_request(employee, uuid) do
+    Enum.find(employee.pending_timeoff_requests, &(&1.uuid == uuid))
   end
 
   defp remove_pending_timeoff_request(employee, %{uuid: uuid}) do

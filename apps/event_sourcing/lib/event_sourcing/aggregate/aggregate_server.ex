@@ -1,5 +1,5 @@
 defmodule EventSourcing.Aggregate.AggregateServer do
-  use GenServer
+  use GenServer, restart: :temporary
 
   alias EventSourcing.EventHandler
 
