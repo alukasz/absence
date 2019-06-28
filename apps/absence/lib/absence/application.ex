@@ -3,22 +3,14 @@ defmodule Absence.Application do
 
   use Application
 
+  alias Absence.Absences.EventHandlers.TimeoffEventHandler
+
   def start(_type, _args) do
     children = [
       Absence.Repo
     ]
 
-    # bamboozled by elixir compilation
-    # registering event handlers during compilation in handle/2,3 macro works great
-    # as long as the module is compiled, which it usually isn't since it gets cached
-    # manually register handlers here until it's fixed
-    alias Absence.Absences.Events.TimeoffRequested
-    alias Absence.Absences.Events.TimeoffRequestApproved
-    alias Absence.Absences.Events.TimeoffRequestRejected
-    alias Absence.Absences.EventHandlers.TimeoffEventHandler
-    EventSourcing.EventHandler.register_handler(TimeoffRequested, TimeoffEventHandler)
-    EventSourcing.EventHandler.register_handler(TimeoffRequestApproved, TimeoffEventHandler)
-    EventSourcing.EventHandler.register_handler(TimeoffRequestRejected, TimeoffEventHandler)
+    EventSourcing.EventHandler.register_handler(TimeoffEventHandler)
 
     opts = [strategy: :one_for_one, name: Absence.Supervisor]
     Supervisor.start_link(children, opts)

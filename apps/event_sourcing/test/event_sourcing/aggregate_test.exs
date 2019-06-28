@@ -106,7 +106,7 @@ defmodule EventSourcing.AggregateTest do
       command: command,
       context: context
     } do
-      EventHandler.register_handler(Incremented, EventHandlerMock)
+      EventHandler.register_handler(EventHandlerMock)
 
       {:ok, event, _aggregate} = Aggregate.execute_command(aggregate, command, context)
 
