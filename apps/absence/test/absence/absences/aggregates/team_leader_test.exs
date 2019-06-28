@@ -1,12 +1,12 @@
 defmodule Absence.Absences.Aggregates.TeamLeaderTest do
-  use ExUnit.Case, async: true
+  use EventSourcing.AggregateCase, async: true
 
   import Absence.Factory
 
-  alias Absence.Absences.Aggregates.TeamLeader
   alias Absence.Absences.Events.TimeoffRequestApproved
   alias Absence.Absences.Events.TimeoffRequestRejected
   alias Absence.Absences.Events.TimeoffReviewRequested
+  alias Absence.Absences.EventHandlers.TimeoffEventHandler
 
   setup do
     team_leader = build_aggregate(:team_leader)
@@ -25,7 +25,7 @@ defmodule Absence.Absences.Aggregates.TeamLeaderTest do
         build_command(:review_timeoff_request, timeoff_request: timeoff_request)
         |> with_team_leader(team_leader)
 
-      assert TeamLeader.execute(team_leader, command) == %TimeoffReviewRequested{
+      assert aggregate_execute(team_leader, command) == %TimeoffReviewRequested{
                team_leader_uuid: team_leader.uuid,
                timeoff_request: timeoff_request
              }
@@ -39,7 +39,7 @@ defmodule Absence.Absences.Aggregates.TeamLeaderTest do
         build_event(:timeoff_review_requested, timeoff_request: timeoff_request)
         |> with_team_leader(team_leader)
 
-      assert %{review_timeoff_requests: [^timeoff_request]} = TeamLeader.apply(team_leader, event)
+      assert %{review_timeoff_requests: [^timeoff_request]} = aggregate_apply(team_leader, event)
     end
   end
 
@@ -56,7 +56,7 @@ defmodule Absence.Absences.Aggregates.TeamLeaderTest do
         |> with_employee(employee)
         |> with_team_leader(team_leader)
 
-      assert TeamLeader.execute(team_leader, command) == %TimeoffRequestApproved{
+      assert aggregate_execute(team_leader, command) == %TimeoffRequestApproved{
                employee_uuid: employee.uuid,
                team_leader_uuid: team_leader.uuid,
                timeoff_request: %{timeoff_request | status: :approved}
@@ -74,7 +74,7 @@ defmodule Absence.Absences.Aggregates.TeamLeaderTest do
         |> with_team_leader(team_leader)
 
       assert %{approved_timeoff_requests: [^timeoff_request], rejected_timeoff_requests: []} =
-               TeamLeader.apply(team_leader, event)
+               aggregate_apply(team_leader, event)
     end
 
     test "TimeoffRequestApproved event removes TimeoffRequest from review", %{
@@ -82,14 +82,27 @@ defmodule Absence.Absences.Aggregates.TeamLeaderTest do
       team_leader: team_leader,
       timeoff_request: timeoff_request
     } do
-      team_leader = %{team_leader | review_timeoff_requests: [timeoff_request]}
-
       event =
         build_event(:timeoff_request_approved, timeoff_request: timeoff_request)
         |> with_employee(employee)
         |> with_team_leader(team_leader)
 
-      assert %{review_timeoff_requests: []} = TeamLeader.apply(team_leader, event)
+      assert %{review_timeoff_requests: []} = aggregate_apply(team_leader, event)
+    end
+
+    test "TimeoffRequestApproved event invokes TimeoffEventHandler", %{
+      employee: employee,
+      team_leader: team_leader,
+      timeoff_request: timeoff_request
+    } do
+      event =
+        build_event(:timeoff_request_approved, timeoff_request: timeoff_request)
+        |> with_employee(employee)
+        |> with_team_leader(team_leader)
+
+      aggregate_apply(team_leader, event)
+
+      assert event_handler_invoked(TimeoffEventHandler)
     end
   end
 
@@ -106,7 +119,7 @@ defmodule Absence.Absences.Aggregates.TeamLeaderTest do
         |> with_employee(employee)
         |> with_team_leader(team_leader)
 
-      assert TeamLeader.execute(team_leader, command) == %TimeoffRequestRejected{
+      assert aggregate_execute(team_leader, command) == %TimeoffRequestRejected{
                employee_uuid: employee.uuid,
                team_leader_uuid: team_leader.uuid,
                timeoff_request: %{timeoff_request | status: :rejected}
@@ -124,7 +137,7 @@ defmodule Absence.Absences.Aggregates.TeamLeaderTest do
         |> with_team_leader(team_leader)
 
       assert %{approved_timeoff_requests: [], rejected_timeoff_requests: [^timeoff_request]} =
-               TeamLeader.apply(team_leader, event)
+               aggregate_apply(team_leader, event)
     end
 
     test "TimeoffRequestRejected event removes TimeoffRequest from review", %{
@@ -132,14 +145,27 @@ defmodule Absence.Absences.Aggregates.TeamLeaderTest do
       team_leader: team_leader,
       timeoff_request: timeoff_request
     } do
-      team_leader = %{team_leader | review_timeoff_requests: [timeoff_request]}
-
       event =
         build_event(:timeoff_request_rejected, timeoff_request: timeoff_request)
         |> with_employee(employee)
         |> with_team_leader(team_leader)
 
-      assert %{review_timeoff_requests: []} = TeamLeader.apply(team_leader, event)
+      assert %{review_timeoff_requests: []} = aggregate_apply(team_leader, event)
+    end
+
+    test "TimeoffRequestRejected event invokes TimeoffEventHandler", %{
+      employee: employee,
+      team_leader: team_leader,
+      timeoff_request: timeoff_request
+    } do
+      event =
+        build_event(:timeoff_request_rejected, timeoff_request: timeoff_request)
+        |> with_employee(employee)
+        |> with_team_leader(team_leader)
+
+      aggregate_apply(team_leader, event)
+
+      assert event_handler_invoked(TimeoffEventHandler)
     end
   end
 
