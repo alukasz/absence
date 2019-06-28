@@ -38,7 +38,7 @@ defmodule EventSourcing.AggregateTest do
 
       Aggregate.execute_command(aggregate, command, context)
 
-      assert_receive {:aggregate_called, Counter, command}
+      assert_receive {:aggregate_called, Counter, _, command}
       refute command.uuid == nil
     end
 

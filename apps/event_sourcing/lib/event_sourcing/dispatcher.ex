@@ -18,7 +18,11 @@ defmodule EventSourcing.Dispatcher do
 
   defmacro __before_compile__(_env) do
     quote do
-      def dispatch(command) do
+      def dispatch(_command) do
+        {:error, :unregistered_command}
+      end
+
+      def dispatch(_command, _opts) do
         {:error, :unregistered_command}
       end
     end
@@ -37,6 +41,23 @@ defmodule EventSourcing.Dispatcher do
         }
 
         case Aggregate.execute_command({unquote(aggregate_mod), aggregate_uuid}, command, context) do
+          {:ok, _, _} -> :ok
+          error -> error
+        end
+      end
+
+      def dispatch(%unquote(command_mod){} = command, opts) do
+        aggregate_mod = Keyword.get(opts, :to, unquote(aggregate_mod))
+        identity = Keyword.get(opts, :identity, unquote(identity))
+        aggregate_uuid = Map.fetch!(command, identity)
+
+        context = %Context{
+          command: command,
+          aggregate_mod: aggregate_mod,
+          aggregate_uuid: aggregate_uuid
+        }
+
+        case Aggregate.execute_command({aggregate_mod, aggregate_uuid}, command, context) do
           {:ok, _, _} -> :ok
           error -> error
         end
