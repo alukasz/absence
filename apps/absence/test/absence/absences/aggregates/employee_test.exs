@@ -8,6 +8,8 @@ defmodule Absence.Absences.Aggregates.EmployeeTest do
   alias Absence.Absences.Events.TimeoffRequested
   alias Absence.Absences.Events.TeamLeaderSet
   alias Absence.Absences.Events.TeamLeaderAwarded
+  alias Absence.Absences.Events.TimeoffRequestApproved
+  alias Absence.Absences.Events.TimeoffRequestRejected
   alias Absence.Absences.EventHandlers.TimeoffEventHandler
 
   setup do
@@ -127,64 +129,100 @@ defmodule Absence.Absences.Aggregates.EmployeeTest do
   end
 
   describe "approving timeoff requests" do
-    setup %{employee: employee, team_leader: team_leader, timeoff_request: timeoff_request} do
-      employee = %{employee | pending_timeoff_requests: [timeoff_request]}
+    setup :pending_timeoff_request
 
-      timeoff_request_approved_event =
-        build_event(:timeoff_request_approved, timeoff_request: timeoff_request)
+    test "ApproveTimeoffRequest command generates TimeoffRequestApproved", %{
+      employee: employee,
+      team_leader: team_leader,
+      timeoff_request: timeoff_request
+    } do
+      command =
+        build_command(:approve_timeoff_request)
         |> with_employee(employee)
         |> with_team_leader(team_leader)
+        |> with_timeoff_request(timeoff_request)
 
-      {:ok, employee: employee, timeoff_request_approved_event: timeoff_request_approved_event}
+      assert aggregate_execute(employee, command) == %TimeoffRequestApproved{
+               employee_uuid: employee.uuid,
+               team_leader_uuid: team_leader.uuid,
+               timeoff_request: %{timeoff_request | status: :approved}
+             }
     end
 
     test "TimeoffRequestApproved event adds TimeoffRequest to approved timeoff requests", %{
       employee: employee,
-      timeoff_request: timeoff_request,
-      timeoff_request_approved_event: timeoff_request_approved_event
+      team_leader: team_leader,
+      timeoff_request: timeoff_request
     } do
+      event =
+        build_event(:timeoff_request_approved, timeoff_request: timeoff_request)
+        |> with_employee(employee)
+        |> with_team_leader(team_leader)
+
       assert %{approved_timeoff_requests: [^timeoff_request], rejected_timeoff_requests: []} =
-               aggregate_apply(employee, timeoff_request_approved_event)
+               aggregate_apply(employee, event)
     end
 
-    test "TimeoffRequestApproved event removes appropriate TimeoffRequest from pending timeoff requests",
-         %{
-           employee: employee,
-           timeoff_request_approved_event: timeoff_request_approved_event
-         } do
-      assert %{pending_timeoff_requests: []} =
-               aggregate_apply(employee, timeoff_request_approved_event)
+    test "TimeoffRequestApproved event removes TimeoffRequest from pending timeoff requests", %{
+      employee: employee,
+      team_leader: team_leader,
+      timeoff_request: timeoff_request
+    } do
+      event =
+        build_event(:timeoff_request_approved, timeoff_request: timeoff_request)
+        |> with_employee(employee)
+        |> with_team_leader(team_leader)
+
+      assert %{pending_timeoff_requests: []} = aggregate_apply(employee, event)
     end
   end
 
   describe "rejecting timeoff requests" do
-    setup %{employee: employee, team_leader: team_leader, timeoff_request: timeoff_request} do
-      employee = %{employee | pending_timeoff_requests: [timeoff_request]}
+    setup :pending_timeoff_request
 
-      timeoff_request_rejected_event =
-        build_event(:timeoff_request_rejected, timeoff_request: timeoff_request)
+    test "RejectTimeoffRequest command generates TimeoffRequestRejected", %{
+      employee: employee,
+      team_leader: team_leader,
+      timeoff_request: timeoff_request
+    } do
+      command =
+        build_command(:reject_timeoff_request)
         |> with_employee(employee)
         |> with_team_leader(team_leader)
+        |> with_timeoff_request(timeoff_request)
 
-      {:ok, employee: employee, timeoff_request_rejected_event: timeoff_request_rejected_event}
+      assert aggregate_execute(employee, command) == %TimeoffRequestRejected{
+               employee_uuid: employee.uuid,
+               team_leader_uuid: team_leader.uuid,
+               timeoff_request: %{timeoff_request | status: :rejected}
+             }
     end
 
     test "TimeoffRequestRejected event adds TimeoffRequest to rejected timeoff requests", %{
       employee: employee,
-      timeoff_request: timeoff_request,
-      timeoff_request_rejected_event: timeoff_request_rejected_event
+      team_leader: team_leader,
+      timeoff_request: timeoff_request
     } do
-      assert %{approved_timeoff_requests: [], rejected_timeoff_requests: [^timeoff_request]} =
-               aggregate_apply(employee, timeoff_request_rejected_event)
+      event =
+        build_event(:timeoff_request_rejected, timeoff_request: timeoff_request)
+        |> with_employee(employee)
+        |> with_team_leader(team_leader)
+
+      assert %{rejected_timeoff_requests: [^timeoff_request], approved_timeoff_requests: []} =
+               aggregate_apply(employee, event)
     end
 
-    test "TimeoffRequestRejected event removes appropriate TimeoffRequest from pending timeoff requests",
-         %{
-           employee: employee,
-           timeoff_request_rejected_event: timeoff_request_rejected_event
-         } do
-      assert %{pending_timeoff_requests: []} =
-               aggregate_apply(employee, timeoff_request_rejected_event)
+    test "TimeoffRequestRejected event removes TimeoffRequest from pending timeoff requests", %{
+      employee: employee,
+      team_leader: team_leader,
+      timeoff_request: timeoff_request
+    } do
+      event =
+        build_event(:timeoff_request_rejected, timeoff_request: timeoff_request)
+        |> with_employee(employee)
+        |> with_team_leader(team_leader)
+
+      assert %{pending_timeoff_requests: []} = aggregate_apply(employee, event)
     end
   end
 
@@ -204,5 +242,11 @@ defmodule Absence.Absences.Aggregates.EmployeeTest do
 
       assert %{team_leader_aggregate_uuid: ^team_leader_uuid} = aggregate_apply(employee, event)
     end
+  end
+
+  defp pending_timeoff_request(%{employee: employee, timeoff_request: timeoff_request}) do
+    employee = %{employee | pending_timeoff_requests: [timeoff_request]}
+
+    {:ok, employee: employee}
   end
 end
