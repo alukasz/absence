@@ -2,10 +2,20 @@ defmodule EventSourcing.EventHandler do
   use GenServer
 
   defmacro __using__(_opts) do
-    {:ok, _} = Application.ensure_all_started(:event_sourcing)
-
     quote do
       import EventSourcing.EventHandler, only: [handle: 2, handle: 3]
+
+      @before_compile EventSourcing.EventHandler
+
+      Module.register_attribute(__MODULE__, :events, accumulate: true)
+    end
+  end
+
+  defmacro __before_compile__(env) do
+    events = Module.get_attribute(env.module, :events) |> Enum.uniq()
+
+    quote do
+      def __events__, do: unquote(events)
     end
   end
 
@@ -13,7 +23,7 @@ defmodule EventSourcing.EventHandler do
     event_mod = get_event_mod(event)
 
     quote do
-      EventSourcing.EventHandler.register_handler(unquote(event_mod), __MODULE__)
+      @events unquote(event_mod)
 
       def handle_event(unquote(event), unquote(aggregate)) do
         unquote(block)
@@ -28,8 +38,16 @@ defmodule EventSourcing.EventHandler do
     GenServer.start_link(__MODULE__, opts, name: __MODULE__)
   end
 
-  def register_handler(event, handler) do
-    GenServer.call(__MODULE__, {:register_handler, event, handler})
+  def register_handler(handler) do
+    Code.ensure_compiled(handler)
+
+    unless function_exported?(handler, :__events__, 0) do
+      raise ArgumentError,
+            "Module #{handler} does not export __events__/0 function\n" <>
+              "Did you forget to `use EventSourcing.EventHandler`?"
+    end
+
+    GenServer.call(__MODULE__, {:register_handler, handler})
   end
 
   def dispatch(event, aggregate) do
@@ -52,11 +70,13 @@ defmodule EventSourcing.EventHandler do
     {:ok, state}
   end
 
-  def handle_call({:register_handler, event, handler}, _from, state) do
+  def handle_call({:register_handler, handler}, _from, state) do
     state =
-      update_in(state.handlers[event], fn
-        nil -> [handler]
-        handlers -> Enum.uniq([handler | handlers])
+      Enum.reduce(handler.__events__(), state, fn event, state ->
+        update_in(state.handlers[event], fn
+          nil -> [handler]
+          handlers -> Enum.uniq([handler | handlers])
+        end)
       end)
 
     {:reply, :ok, state}

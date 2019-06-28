@@ -4,7 +4,6 @@ defmodule EventSourcing.EventHandlerTest do
   alias EventSourcing.EventHandler
   alias EventSourcing.Counters.Aggregates.Counter
   alias EventSourcing.Counters.Events.Incremented
-  alias EventSourcing.EventHandlerMock
 
   describe "handle/2,3 macro" do
     defmodule HandleTest do
@@ -15,6 +14,8 @@ defmodule EventSourcing.EventHandlerTest do
       handle %Incremented{}, do: :ok
     end
 
+    EventHandler.register_handler(HandleTest)
+
     test "defines handle_event/2 function" do
       assert {:handle_event, 2} in HandleTest.__info__(:functions)
     end
@@ -22,29 +23,36 @@ defmodule EventSourcing.EventHandlerTest do
     test "register event handlers" do
       assert registered_handler?(Incremented, HandleTest)
     end
+
+    test "adds event to __events__" do
+      assert Incremented in HandleTest.__events__()
+    end
   end
 
   setup do
     aggregate = %Counter{}
     event = %Incremented{test_pid: self()}
-    handler = EventHandlerMock
+    handler = EventSourcing.EventHandlerMock
+    EventSourcing.EventHandler.register_handler(handler)
 
     {:ok, aggregate: aggregate, event: event, handler: handler}
   end
 
-  describe "register_handler/2" do
-    test "adds module as event handler", %{event: %event_mod{}, handler: handler} do
-      EventHandler.register_handler(event_mod, handler)
+  describe "register_handler/1" do
+    defmodule RegisterHandlerTest do
+      use EventSourcing.EventHandler
 
-      assert registered_handler?(event_mod, handler)
+      handle %Incremented{}, do: :ok
+    end
+
+    test "adds module as event handler", %{event: %event_mod{}} do
+      EventHandler.register_handler(RegisterHandlerTest)
+
+      assert registered_handler?(event_mod, RegisterHandlerTest)
     end
   end
 
   describe "dispatch/2" do
-    setup %{event: %event_mod{}, handler: handler} do
-      EventHandler.register_handler(event_mod, handler)
-    end
-
     test "sends event to all handlers", %{event: event, aggregate: aggregate} do
       EventHandler.dispatch(event, aggregate)
 
@@ -53,10 +61,6 @@ defmodule EventSourcing.EventHandlerTest do
   end
 
   describe "matching_handlers/1" do
-    setup %{event: %event_mod{}, handler: handler} do
-      EventHandler.register_handler(event_mod, handler)
-    end
-
     test "returns list of event handlers that responds to event", %{
       event: event,
       handler: handler
